@@ -12,7 +12,7 @@
 // Date: 06.10.2017
 // Description: Performance counters
 
-`include "../common/submodules/common_cells/include/common_cells/registers.svh"
+`include "common_cells/registers.svh"
 
 module perf_counters import ariane_pkg::*; (
   input  logic                                    clk_i,
