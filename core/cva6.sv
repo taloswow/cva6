@@ -585,6 +585,7 @@ module cva6 import ariane_pkg::*; #(
   perf_counters i_perf_counters (
     .clk_i             ( clk_i                  ),
     .rst_ni            ( rst_ni                 ),
+    .clr_i             ( '0                     ),
     .debug_mode_i      ( debug_mode             ),
     .addr_i            ( addr_csr_perf          ),
     .we_i              ( we_csr_perf            ),
