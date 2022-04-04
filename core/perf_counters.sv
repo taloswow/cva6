@@ -12,10 +12,12 @@
 // Date: 06.10.2017
 // Description: Performance counters
 
+`include "/common_cells/registers.svh"
 
 module perf_counters import ariane_pkg::*; (
   input  logic                                    clk_i,
   input  logic                                    rst_ni,
+  input  logic                                    clr_i,
   input  logic                                    debug_mode_i, // debug mode
   // SRAM like interface
   input  logic [4:0]                              addr_i,   // read/write address (up to 29 aux counters possible in riscv encoding.h)
@@ -117,12 +119,6 @@ module perf_counters import ariane_pkg::*; (
   // ----------------
   // Registers
   // ----------------
-  always_ff @(posedge clk_i or negedge rst_ni) begin
-    if (!rst_ni) begin
-      perf_counter_q <= '0;
-    end else begin
-      perf_counter_q <= perf_counter_d;
-    end
-  end
+  `FFC(perf_counter_q, perf_counter_d, '0, clk_i, rst_ni, clr_i)
 
 endmodule
