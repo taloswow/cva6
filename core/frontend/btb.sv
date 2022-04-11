@@ -19,6 +19,7 @@ module btb #(
 )(
     input  logic                        clk_i,           // Clock
     input  logic                        rst_ni,          // Asynchronous reset active low
+    input  logic                        clr_i,           // Synchronous clear active high
     input  logic                        flush_i,         // flush the btb
     input  logic                        debug_mode_i,
 
@@ -76,7 +77,7 @@ module btb #(
 
     // sequential process
     always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+        if (!rst_ni || clr_i) begin
             // Bias the branches to be taken upon first arrival
             for (int i = 0; i < NR_ROWS; i++)
                 btb_q[i] <= '{default: 0};

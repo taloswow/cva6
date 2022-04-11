@@ -43,9 +43,12 @@
 // the replay mechanism gets more complicated as it can be that a 32 bit instruction
 // can not be pushed at once.
 
+`include "common_cells/registers.svh"
+
 module instr_queue import ariane_pkg::*; (
   input  logic                                               clk_i,
   input  logic                                               rst_ni,
+  input  logic                                               clr_i,
   input  logic                                               flush_i,
   input  logic [ariane_pkg::INSTR_PER_FETCH-1:0][31:0]       instr_i,
   input  logic [ariane_pkg::INSTR_PER_FETCH-1:0][riscv::VLEN-1:0] addr_i,
@@ -350,6 +353,7 @@ module instr_queue import ariane_pkg::*; (
     ) i_fifo_instr_data (
       .clk_i      ( clk_i                ),
       .rst_ni     ( rst_ni               ),
+      .clr_i      ( clr_i                ),
       .flush_i    ( flush_i              ),
       .testmode_i ( 1'b0                 ),
       .full_o     ( instr_queue_full[i]  ),
@@ -377,6 +381,7 @@ module instr_queue import ariane_pkg::*; (
   ) i_fifo_address (
     .clk_i      ( clk_i                        ),
     .rst_ni     ( rst_ni                       ),
+    .clr_i      ( clr_i                        ),
     .flush_i    ( flush_i                      ),
     .testmode_i ( 1'b0                         ),
     .full_o     ( full_address                 ),
@@ -395,42 +400,22 @@ module instr_queue import ariane_pkg::*; (
   unread i_unread_instr_fifo (.d_i(|instr_queue_usage));
 
   if (ariane_pkg::RVC) begin : gen_pc_q_with_c
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-      if (!rst_ni) begin
-        idx_ds_q        <= 'b1;
-        idx_is_q        <= '0;
-        pc_q            <= '0;
-        reset_address_q <= 1'b1;
-      end else begin
-        pc_q            <= pc_d;
-        reset_address_q <= reset_address_d;
-        if (flush_i) begin
-          // one-hot encoded
-          idx_ds_q        <= 'b1;
-          // binary encoded
-          idx_is_q        <= '0;
-          reset_address_q <= 1'b1;
-        end else begin
-          idx_ds_q        <= idx_ds_d;
-          idx_is_q        <= idx_is_d;
-        end
-      end
-    end
+    logic clear_idx;
+    assign clear_idx = clr_i | flush_i;
+
+    `FFC(idx_is_q, idx_is_d, '0, clk_i, rst_ni, clear_idx)
+    `FFC(idx_ds_q, idx_ds_d, 'b1, clk_i, rst_ni, clear_idx)
+    `FFC(pc_q, pc_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(reset_address_q, reset_address_d, 1'b1, clk_i, rst_ni, clr_i)
   end else begin : gen_pc_q_without_C
     assign idx_ds_q = '0;
     assign idx_is_q = '0;
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-      if (!rst_ni) begin
-        pc_q            <= '0;
-        reset_address_q <= 1'b1;
-      end else begin
-        pc_q            <= pc_d;
-        reset_address_q <= reset_address_d;
-        if (flush_i) begin
-          reset_address_q <= 1'b1;
-        end
-      end
-    end
+
+    logic clear_rst_addr;
+    assign clear_rst_addr = flush_i | clr_i;
+
+    `FFC(pc_q, pc_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(reset_address_q, reset_address_d, 1'b1, clk_i, rst_ni, clear_rst_addr)
   end
 
   // pragma translate_off

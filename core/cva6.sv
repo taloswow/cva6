@@ -71,6 +71,10 @@ module cva6 import ariane_pkg::*; #(
   logic                       eret;
   logic [NR_COMMIT_PORTS-1:0] commit_ack;
 
+  // clear signal, first set to 0
+  logic                       clr_i;
+  assign clr_i = 0;
+
   // --------------
   // PCGEN <-> CSR
   // --------------
@@ -258,6 +262,7 @@ module cva6 import ariane_pkg::*; #(
   frontend #(
     .ArianeCfg ( ArianeCfg )
   ) i_frontend (
+    .clr_i               ( clr_i                         ),
     .flush_i             ( flush_ctrl_if                 ), // not entirely correct
     .flush_bp_i          ( 1'b0                          ),
     .debug_mode_i        ( debug_mode                    ),
@@ -277,7 +282,7 @@ module cva6 import ariane_pkg::*; #(
     .fetch_entry_ready_i ( fetch_ready_id_if             ),
     .*
   );
-
+---------------------------------------------------------------------
   // ---------
   // ID
   // ---------

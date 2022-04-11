@@ -14,11 +14,15 @@
 // Date: 09.06.2018
 
 // return address stack
+
+`include "common_cells/registers.svh"
+
 module ras #(
     parameter int unsigned DEPTH = 2
 )(
     input  logic             clk_i,
     input  logic             rst_ni,
+    input  logic             clr_i,
     input  logic             flush_i,
     input  logic             push_i,
     input  logic             pop_i,
@@ -60,11 +64,6 @@ module ras #(
         end
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            stack_q <= '0;
-        end else begin
-            stack_q <= stack_d;
-        end
-    end
+    `FFC(stack_q, stack_d, '0, clk_i, rst_ni, clr_i)
+
 endmodule
