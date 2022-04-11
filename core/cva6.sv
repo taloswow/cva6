@@ -644,6 +644,8 @@ module cva6 import ariane_pkg::*; #(
     .flush_commit_i         ( flush_commit                  ),
 
     .flush_icache_o         ( icache_flush_ctrl_cache       ),
+
+    .clr_i                  ( clr_i                         ),
     .*
   );
 
