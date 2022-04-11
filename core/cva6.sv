@@ -778,6 +778,7 @@ module cva6 import ariane_pkg::*; #(
     i_pc_fifo (
       .clk_i      ( clk_i                                               ),
       .rst_ni     ( rst_ni                                              ),
+      .clr_i      ( clr_i                                               ),
       .flush_i    ( '0                                                  ),
       .testmode_i ( '0                                                  ),
       .full_o     (                                                     ),
@@ -796,6 +797,7 @@ module cva6 import ariane_pkg::*; #(
   i_rr_arb_tree (
     .clk_i   ( clk_i        ),
     .rst_ni  ( rst_ni       ),
+    .clr_i   ( clr_i        ),
     .flush_i ( '0           ),
     .rr_i    ( '0           ),
     .req_i   ( ~pc_empty    ),
