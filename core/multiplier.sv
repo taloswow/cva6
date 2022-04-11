@@ -14,10 +14,12 @@
 //              This unit relies on retiming features of the synthesizer
 //
 
+`include "common_cells/registers.svh"
 
 module multiplier import ariane_pkg::*; (
     input  logic                     clk_i,
     input  logic                     rst_ni,
+    input  logic                     clr_i,
     input  logic [TRANS_ID_BITS-1:0] trans_id_i,
     input  logic                     mult_valid_i,
     input  fu_op                     operator_i,
@@ -86,19 +88,8 @@ module multiplier import ariane_pkg::*; (
     // -----------------------
     // Output pipeline register
     // -----------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            mult_valid_q    <= '0;
-            trans_id_q      <= '0;
-            operator_q      <=  MUL;
-            mult_result_q   <= '0;
-         end else begin
-            // Input silencing
-            trans_id_q   <= trans_id_i;
-            // Output Register
-            mult_valid_q    <= mult_valid;
-            operator_q      <= operator_d;
-            mult_result_q   <= mult_result_d;
-         end
-    end
+    `FFC(mult_valid_q, mult_valid, '0, clk_i, rst_ni, clr_i)
+    `FFC(trans_id_q, trans_id_i, '0, clk_i, rst_ni, clr_i)
+    `FFC(operator_q, operator_d, MUL, clk_i, rst_ni, clr_i)
+    `FFC(mult_result_q, mult_result_d, '0, clk_i, rst_ni, clr_i)
 endmodule

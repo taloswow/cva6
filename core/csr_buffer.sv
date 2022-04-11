@@ -13,10 +13,12 @@
 // Description: Buffer to hold CSR address, this acts like a functional unit
 //              to the scoreboard.
 
+`include "common_cells/registers.svh"
 
 module csr_buffer import ariane_pkg::*; (
     input  logic                     clk_i,          // Clock
     input  logic                     rst_ni,         // Asynchronous reset active low
+    input  logic                     clr_i,          // Synchronous clear active high
     input  logic                     flush_i,
 
     input  fu_data_t                 fu_data_i,
@@ -62,12 +64,6 @@ module csr_buffer import ariane_pkg::*; (
             csr_reg_n.valid       = 1'b0;
     end
     // sequential process
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if(~rst_ni) begin
-            csr_reg_q <= '{default: 0};
-        end else begin
-            csr_reg_q <= csr_reg_n;
-        end
-    end
+    `FFC(csr_reg_q, csr_reg_n, ('{default: 0}), clk_i, rst_ni, clr_i)
 
 endmodule

@@ -20,6 +20,7 @@ module ex_stage import ariane_pkg::*; #(
 ) (
     input  logic                                   clk_i,    // Clock
     input  logic                                   rst_ni,   // Asynchronous reset active low
+    input  logic                                   clr_i,    // Synchronous clear active high
     input  logic                                   flush_i,
     input  logic                                   debug_mode_i,
 
@@ -192,6 +193,7 @@ module ex_stage import ariane_pkg::*; #(
     csr_buffer csr_buffer_i (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .flush_i,
         .fu_data_i,
         .csr_valid_i,
@@ -233,6 +235,7 @@ module ex_stage import ariane_pkg::*; #(
     mult i_mult (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .flush_i,
         .mult_valid_i,
         .fu_data_i       ( mult_data     ),
@@ -253,6 +256,7 @@ module ex_stage import ariane_pkg::*; #(
             fpu_wrap fpu_i (
                 .clk_i,
                 .rst_ni,
+		.clr_i,
                 .flush_i,
                 .fpu_valid_i,
                 .fpu_ready_o,

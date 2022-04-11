@@ -379,8 +379,6 @@ module cva6 import ariane_pkg::*; #(
     .*
   );
 
-  ---------------------------------------------------------------------------
-
   // ---------
   // EX
   // ---------
@@ -390,6 +388,7 @@ module cva6 import ariane_pkg::*; #(
   ) ex_stage_i (
     .clk_i                  ( clk_i                       ),
     .rst_ni                 ( rst_ni                      ),
+    .clr_i                  ( clr_i                       ),
     .debug_mode_i           ( debug_mode                  ),
     .flush_i                ( flush_ctrl_ex               ),
     .rs1_forwarding_i       ( rs1_forwarding_id_ex        ),
