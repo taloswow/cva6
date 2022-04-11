@@ -54,6 +54,7 @@ module wt_l15_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input logic                  clk_i,
   input logic                  rst_ni,
+  input logic                  clr_i,
 
   // icache
   input  logic                 icache_data_req_i,
@@ -142,6 +143,7 @@ l15_rtrn_t rtrn_fifo_data;
   ) i_rrarbiter (
     .clk_i  ( clk_i                ),
     .rst_ni ( rst_ni               ),
+    .clr_i  ( clr_i                ),
     .flush_i( '0                   ),
     .en_i   ( l15_rtrn_i.l15_ack   ),
     .req_i  ( arb_req              ),
@@ -192,6 +194,7 @@ l15_rtrn_t rtrn_fifo_data;
     ) i_icache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  icache_data_full        ),
@@ -210,6 +213,7 @@ l15_rtrn_t rtrn_fifo_data;
     ) i_dcache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  dcache_data_full        ),
@@ -327,6 +331,7 @@ l15_rtrn_t rtrn_fifo_data;
   ) i_rtrn_fifo (
     .clk_i       (  clk_i                    ),
     .rst_ni      (  rst_ni                   ),
+    .clr_i       (  clr_i                    ),
     .flush_i     (  1'b0                     ),
     .testmode_i  (  1'b0                     ),
     .full_o      (  rtrn_fifo_full           ),

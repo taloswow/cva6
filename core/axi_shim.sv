@@ -18,6 +18,7 @@
  *
  */
 
+`include "common_cells/registers.svh"
 
 module axi_shim #(
   parameter int unsigned AxiNumWords = 4, // data width in dwords, this is also the maximum burst length, must be >=2
@@ -25,6 +26,7 @@ module axi_shim #(
 ) (
   input  logic                            clk_i,  // Clock
   input  logic                            rst_ni, // Asynchronous reset active low
+  input  logic                            clr_i,  // Synchronous clear active high
   // read channel
   // request
   input  logic                            rd_req_i,
@@ -271,6 +273,8 @@ module axi_shim #(
       wr_cnt_q   <= wr_cnt_d;
     end
   end
+  `FFC(wr_state_q, wr_state_d, IDLE, clk_i, rst_ni, clr_i)
+  `FFC(wr_cnt_q, wr_cnt_d, '0, clk_i, rst_ni, clr_i)
 
 // ----------------
 // Assertions
