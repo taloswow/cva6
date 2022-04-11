@@ -282,13 +282,14 @@ module cva6 import ariane_pkg::*; #(
     .fetch_entry_ready_i ( fetch_ready_id_if             ),
     .*
   );
----------------------------------------------------------------------
+  
   // ---------
   // ID
   // ---------
   id_stage id_stage_i (
     .clk_i,
     .rst_ni,
+    .clr_i,
     .flush_i                    ( flush_ctrl_if              ),
     .debug_req_i,
 
