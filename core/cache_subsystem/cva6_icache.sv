@@ -422,6 +422,7 @@ end else begin : gen_piton_offset
     ) tag_sram (
       .clk_i     ( clk_i                    ),
       .rst_ni    ( rst_ni                   ),
+      .clr_i     ( clr_i                    ),
       .req_i     ( vld_req[i]               ),
       .we_i      ( vld_we                   ),
       .addr_i    ( vld_addr                 ),
@@ -442,6 +443,7 @@ end else begin : gen_piton_offset
     ) data_sram (
       .clk_i     ( clk_i               ),
       .rst_ni    ( rst_ni              ),
+      .clr_i     ( clr_i               ),
       .req_i     ( cl_req[i]           ),
       .we_i      ( cl_we               ),
       .addr_i    ( cl_index            ),

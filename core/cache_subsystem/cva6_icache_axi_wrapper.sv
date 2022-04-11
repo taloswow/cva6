@@ -13,11 +13,14 @@
 // Description: wrapper module to connect the L1I$ to a 64bit AXI bus.
 //
 
+`include "common_cells/registers.svh"
+
 module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter ariane_cfg_t ArianeCfg = ArianeDefaultConfig  // contains cacheable regions
 ) (
   input  logic              clk_i,
   input  logic              rst_ni,
+  input  logic              clr_i,
   input riscv::priv_lvl_t   priv_lvl_i,
 
   input  logic              flush_i,     // flush the icache, flush and kill have to be asserted together
@@ -100,6 +103,7 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_cva6_icache (
     .clk_i              ( clk_i               ),
     .rst_ni             ( rst_ni              ),
+    .clr_i              ( clr_i               ),
     .flush_i            ( flush_i             ),
     .en_i               ( en_i                ),
     .miss_o             ( miss_o              ),
@@ -123,6 +127,7 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_axi_shim (
     .clk_i           ( clk_i             ),
     .rst_ni          ( rst_ni            ),
+    .clr_i           ( clr_i             ),
     .rd_req_i        ( axi_rd_req        ),
     .rd_gnt_o        ( axi_rd_gnt        ),
     .rd_addr_i       ( axi_rd_addr       ),
@@ -171,18 +176,9 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   end
 
   // Registers
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_rd_buf
-    if (!rst_ni) begin
-      req_valid_q <= 1'b0;
-      req_data_q  <= '0;
-      first_q     <= 1'b1;
-      rd_shift_q  <= '0;
-    end else begin
-      req_valid_q <= req_valid_d;
-      req_data_q  <= req_data_d;
-      first_q     <= first_d;
-      rd_shift_q  <= rd_shift_d;
-    end
-  end
+  `FFC(req_valid_q, req_valid_d, 1'b0, clk_i, rst_ni, clr_i)
+  `FFC(req_data_q, req_data_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(first_q, first_d, 1'b1, clk_i, rst_ni, clr_i)
+  `FFC(rd_shift_q, rd_shift_d, '0, clk_i, rst_ni, clr_i)
 
 endmodule // cva6_icache_axi_wrapper
