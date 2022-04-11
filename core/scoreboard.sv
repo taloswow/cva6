@@ -12,6 +12,8 @@
 // Date: 08.04.2017
 // Description: Scoreboard - keeps track of all decoded, issued and committed instructions
 
+`include "common_cells/registers.svh"
+
 module scoreboard #(
   parameter int unsigned NR_ENTRIES      = 8, // must be a power of 2
   parameter int unsigned NR_WB_PORTS     = 1,
@@ -19,6 +21,7 @@ module scoreboard #(
 ) (
   input  logic                                                  clk_i,    // Clock
   input  logic                                                  rst_ni,   // Asynchronous reset active low
+  input  logic                                                  clr_i,    // Synchronous clear active high
   output logic                                                  sb_full_o,
   input  logic                                                  flush_unissued_instr_i, // flush only un-issued instructions
   input  logic                                                  flush_i,  // flush whole scoreboard
@@ -236,6 +239,7 @@ module scoreboard #(
     ) i_sel_gpr_clobbers (
       .clk_i   ( clk_i               ),
       .rst_ni  ( rst_ni              ),
+      .clr_i   ( clr_i               ),
       .flush_i ( 1'b0                ),
       .rr_i    ( '0                  ),
       .req_i   ( gpr_clobber_vld[k]  ),
@@ -254,6 +258,7 @@ module scoreboard #(
     ) i_sel_fpr_clobbers (
       .clk_i   ( clk_i               ),
       .rst_ni  ( rst_ni              ),
+      .clr_i   ( clr_i               ),
       .flush_i ( 1'b0                ),
       .rr_i    ( '0                  ),
       .req_i   ( fpr_clobber_vld[k]  ),
@@ -303,6 +308,7 @@ module scoreboard #(
   ) i_sel_rs1 (
     .clk_i   ( clk_i       ),
     .rst_ni  ( rst_ni      ),
+    .clr_i   ( clr_i       ),
     .flush_i ( 1'b0        ),
     .rr_i    ( '0          ),
     .req_i   ( rs1_fwd_req ),
@@ -322,6 +328,7 @@ module scoreboard #(
   ) i_sel_rs2 (
     .clk_i   ( clk_i       ),
     .rst_ni  ( rst_ni      ),
+    .clr_i   ( clr_i       ),
     .flush_i ( 1'b0        ),
     .rr_i    ( '0          ),
     .req_i   ( rs2_fwd_req ),
@@ -343,6 +350,7 @@ module scoreboard #(
   ) i_sel_rs3 (
     .clk_i   ( clk_i       ),
     .rst_ni  ( rst_ni      ),
+    .clr_i   ( clr_i       ),
     .flush_i ( 1'b0        ),
     .rr_i    ( '0          ),
     .req_i   ( rs3_fwd_req ),
@@ -362,19 +370,10 @@ module scoreboard #(
 
 
   // sequential process
-  always_ff @(posedge clk_i or negedge rst_ni) begin : regs
-    if(!rst_ni) begin
-      mem_q                 <= '{default: sb_mem_t'(0)};
-      issue_cnt_q           <= '0;
-      commit_pointer_q      <= '0;
-      issue_pointer_q       <= '0;
-    end else begin
-      issue_cnt_q           <= issue_cnt_n;
-      issue_pointer_q       <= issue_pointer_n;
-      mem_q                 <= mem_n;
-      commit_pointer_q      <= commit_pointer_n;
-    end
-  end
+  `FFC(issue_cnt_q, issue_cn_n, '0, clk_i, rst_ni, clr_i)
+  `FFC(issue_pointer_q, issue_pointer_n, '0, clk_i, rst_ni, clr_i)
+  `FFC(commit_pointer_q, commit_pointer_n, '0, clk_i, rst_ni, clr_i)
+  `FFC(mem_q, mem_n, ('{default: sb_mem_t'(0)}), clk_i, rst_ni, clr_i)
 
   //pragma translate_off
   `ifndef VERILATOR

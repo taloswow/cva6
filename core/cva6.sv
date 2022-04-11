@@ -323,6 +323,7 @@ module cva6 import ariane_pkg::*; #(
   ) issue_stage_i (
     .clk_i,
     .rst_ni,
+    .clr_i,
     .sb_full_o                  ( sb_full                      ),
     .flush_unissued_instr_i     ( flush_unissued_instr_ctrl_id ),
     .flush_i                    ( flush_ctrl_id                ),
@@ -377,6 +378,8 @@ module cva6 import ariane_pkg::*; #(
     .commit_ack_i               ( commit_ack                   ),
     .*
   );
+
+  ---------------------------------------------------------------------------
 
   // ---------
   // EX

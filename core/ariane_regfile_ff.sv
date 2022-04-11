@@ -31,6 +31,7 @@ module ariane_regfile #(
   // clock and reset
   input  logic                                      clk_i,
   input  logic                                      rst_ni,
+  input  logic                                      clr_i,
   // disable clock gates for testing
   input  logic                                      test_en_i,
   // read port
@@ -62,7 +63,7 @@ module ariane_regfile #(
 
     // loop from 1 to NUM_WORDS-1 as R0 is nil
     always_ff @(posedge clk_i, negedge rst_ni) begin : register_write_behavioral
-        if (~rst_ni) begin
+        if (~rst_ni || clr_i) begin
             mem <= '{default: '0};
         end else begin
             for (int unsigned j = 0; j < NR_WRITE_PORTS; j++) begin
