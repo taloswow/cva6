@@ -19,6 +19,7 @@ module load_store_unit import ariane_pkg::*; #(
 )(
     input  logic                     clk_i,
     input  logic                     rst_ni,
+    input  logic                     clr_i,
     input  logic                     flush_i,
     output logic                     no_st_pending_o,
     input  logic                     amo_valid_commit_i,
@@ -229,6 +230,7 @@ module load_store_unit import ariane_pkg::*; #(
     store_unit i_store_unit (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .flush_i,
         .no_st_pending_o,
         .store_buffer_empty_o  ( store_buffer_empty   ),
@@ -303,6 +305,7 @@ module load_store_unit import ariane_pkg::*; #(
     ) i_pipe_reg_load (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .d_i ( {ld_valid, ld_trans_id, ld_result, ld_ex} ),
         .d_o ( {load_valid_o, load_trans_id_o, load_result_o, load_exception_o} )
     );
@@ -313,6 +316,7 @@ module load_store_unit import ariane_pkg::*; #(
     ) i_pipe_reg_store (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .d_i ( {st_valid, st_trans_id, st_result, st_ex} ),
         .d_o ( {store_valid_o, store_trans_id_o, store_result_o, store_exception_o} )
     );

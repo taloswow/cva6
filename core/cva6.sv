@@ -704,6 +704,7 @@ module cva6 import ariane_pkg::*; #(
     // to D$
     .clk_i                 ( clk_i                       ),
     .rst_ni                ( rst_ni                      ),
+    .clr_i                 ( clr_i                       ),
     .priv_lvl_i            ( priv_lvl                    ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
