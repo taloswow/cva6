@@ -350,7 +350,7 @@ module instr_realign import ariane_pkg::*; (
 	end
     end
 
-    `FFLC(unaligned_address_q, unaligned_address_d, '0, clk_i, rst_ni, clr_i, valid_i)
-    `FFLC(unaligned_instr_q, unaligned_instr_q, '0, clk_i, rst_ni, clr_i, valid_i)
+    `FFLARNC(unaligned_address_q, unaligned_address_d, valid_i, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(unaligned_instr_q, unaligned_instr_q, valid_i, clr_i, '0, clk_i, rst_ni)
     `FFC(unaligned_q, unaligned_in, 1'b0, clk_i, rst_ni, clr_i)
 endmodule

@@ -358,11 +358,11 @@ module frontend import ariane_pkg::*; #(
     `FFC(npc_q, npc_d, '0, clk_i, rst_ni, clr_i)
     `FFC(speculative_q, speculative_d, '0, clk_i, rst_ni, clr_i)
     `FFC(icache_valid_q, icache_dreq_i.valid, '0, clk_i, rst_ni, clr_i)
-    `FFLC(icache_data_q, icache_data, '0, clk_i, rst_ni, clr_i, icache_dreq_i.valid)
-    `FFLC(icache_vaddr_q, icache_dreq_i.vaddr, 'b0, clk_i, rst_ni, clr_i, icache_dreq_i.valid)
-    `FFLC(btb_q, btb_prediction[INSTR_PER_FETCH-1], '0, clk_i, rst_ni, clr_i, icache_dreq_i.valid)
-    `FFLC(bht_q, bht_prediction[INSTR_PER_FETCH-1], '0, clk_i, rst_ni, clr_i, icache_dreq_i.valid)
-    `FFLC(icache_ex_valid_q, icache_ex_valid_in, ariane_pkg::FE_NONE, clk_i, rst_ni, clr_i, icache_dreq_i.valid)
+    `FFLARNC(icache_data_q, icache_data, icache_dreq_i.valid, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(icache_vaddr_q, icache_dreq_i.vaddr, icache_dreq_i.valid, clr_i, 'b0, clk_i, rst_ni)
+    `FFLARNC(btb_q, btb_prediction[INSTR_PER_FETCH-1], icache_dreq_i.valid, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(bht_q, bht_prediction[INSTR_PER_FETCH-1], icache_dreq_i.valid, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(icache_ex_valid_q, icache_ex_valid_in, icache_dreq_i.valid, clr_i, ariane_pkg::FE_NONE, clk_i, rst_ni)
 
     ras #(
       .DEPTH  ( ArianeCfg.RASDepth  )

@@ -454,17 +454,17 @@ module fpu_wrap import ariane_pkg::*; (
 
     // Buffer register and FSM state holding
     `FFC(state_q, state_d, READY, clk_i, rst_ni, clr_i)
-    `FFLC(operand_a_q, operand_a_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(operand_b_q, operand_b_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(operand_c_q, operand_c_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_op_q, fpu_op_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_op_mod_q, fpu_op_mod_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_srcfmt_q, fpu_srcfmt_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_dstfmt_q, fpu_dstfmt_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_ifmt_q, fpu_ifmt_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_rm_q, fpu_rm_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_vec_op_q, fpu_vec_op_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
-    `FFLC(fpu_tag_q, fpu_tag_d, '0, clk_i, rst_ni, clr_i, hold_inputs)
+    `FFLARNC(operand_a_q, operand_a_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(operand_b_q, operand_b_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(operand_c_q, operand_c_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_op_q, fpu_op_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_op_mod_q, fpu_op_mod_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_srcfmt_q, fpu_srcfmt_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_dstfmt_q, fpu_dstfmt_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_ifmt_q, fpu_ifmt_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_rm_q, fpu_rm_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_vec_op_q, fpu_vec_op_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_tag_q, fpu_tag_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
 
     // Select FPU input data: from register if valid data in register, else directly from input
     assign operand_a  = use_hold ? operand_a_q  : operand_a_d;
