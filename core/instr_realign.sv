@@ -344,9 +344,9 @@ module instr_realign import ariane_pkg::*; (
         if (flush_i) begin
             unaligned_in = 1'b0;
         end else if (valid_i) begin
-	    unaligned_in = unaligned_d
+	    unaligned_in = unaligned_d;
 	end else begin
-	    unaligned_in = unaligned_1
+	    unaligned_in = unaligned_q;
 	end
     end
 

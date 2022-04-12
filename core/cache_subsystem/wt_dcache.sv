@@ -12,7 +12,7 @@
 // Date: 13.09.2018
 // Description: Write-Through Data cache that is compatible with openpiton.
 
-`include "common_cells/register.svh"
+`include "common_cells/registers.svh"
 
 module wt_dcache import ariane_pkg::*; import wt_cache_pkg::*; #(
   // ID to be used for read and AMO transactions.

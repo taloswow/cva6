@@ -346,7 +346,7 @@ module frontend import ariane_pkg::*; #(
 
     always_comb begin
         if (icache_dreq_i.ex.cause == riscv::INSTR_PAGE_FAULT) begin
-            icache_ex_valid_in = arianepkg::FE_INSTR_PAGE_FAULT;
+            icache_ex_valid_in = ariane_pkg::FE_INSTR_PAGE_FAULT;
 	end else if (icache_dreq_i.ex.cause == riscv::INSTR_ACCESS_FAULT) begin
 	    icache_ex_valid_in = ariane_pkg::FE_INSTR_ACCESS_FAULT;
 	end else begin
