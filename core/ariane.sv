@@ -82,6 +82,7 @@ module ariane import ariane_pkg::*; #(
     cvxif_example_coprocessor i_cvxif_coprocessor (
       .clk_i                ( clk_i                          ),
       .rst_ni               ( rst_ni                         ),
+      .clr_i                ( clr_i                          ),
       .cvxif_req_i          ( cvxif_req                      ),
       .cvxif_resp_o         ( cvxif_resp                     )
     );
