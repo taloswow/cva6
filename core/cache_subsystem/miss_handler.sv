@@ -540,6 +540,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_bypass_arbiter (
         .clk_i (clk_i),
         .rst_ni(rst_ni),
+	.clr_i (clr_i),
         // Master Side
         .req_i (bypass_ports_req),
         .rsp_o (bypass_ports_rsp),
@@ -558,6 +559,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_bypass_axi_adapter (
         .clk_i                (clk_i),
         .rst_ni               (rst_ni),
+	.clr_i                (clr_i),
         .req_i                (bypass_adapter_req.req),
         .type_i               (bypass_adapter_req.reqtype),
         .amo_i                (bypass_adapter_req.amo),
@@ -587,6 +589,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_miss_axi_adapter (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .req_i               ( req_fsm_miss_valid ),
         .type_i              ( req_fsm_miss_req   ),
         .amo_i               ( AMO_NONE           ),
