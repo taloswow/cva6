@@ -115,6 +115,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_stream_arbiter_ar (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .inp_data_i  ( {axi_req_icache.ar, axi_req_bypass.ar, axi_req_data.ar} ),
         .inp_valid_i ( {axi_req_icache.ar_valid, axi_req_bypass.ar_valid, axi_req_data.ar_valid} ),
         .inp_ready_o ( {axi_resp_icache.ar_ready, axi_resp_bypass.ar_ready, axi_resp_data.ar_ready} ),
@@ -130,6 +131,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_stream_arbiter_aw (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .inp_data_i  ( {axi_req_icache.aw, axi_req_bypass.aw, axi_req_data.aw} ),
         .inp_valid_i ( {axi_req_icache.aw_valid, axi_req_bypass.aw_valid, axi_req_data.aw_valid} ),
         .inp_ready_o ( {axi_resp_icache.aw_ready, axi_resp_bypass.aw_ready, axi_resp_data.aw_ready} ),
