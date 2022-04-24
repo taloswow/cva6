@@ -243,7 +243,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_exp_backoff (
     .clk_i,
     .rst_ni,
-    .clr_i,
+    .clear_i   ( clr_i         ),
     .set_i     ( sc_fail         ),
     .clr_i     ( sc_pass         ),
     .is_zero_o ( sc_backoff_over )

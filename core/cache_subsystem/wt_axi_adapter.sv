@@ -519,7 +519,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   `FFC(dcache_rtrn_vld_q, dcache_rtrn_vld_d, '0, clk_i, rst_ni, clr_i)
   `FFC(icache_rtrn_tid_q, icache_rtrn_tid_d, '0, clk_i, rst_ni, clr_i)
   `FFC(dcache_rtrn_tid_q, dcache_rtrn_tid_d, '0, clk_i, rst_ni, clr_i)
-  `FFC(dcache_rtrn_type_q, dache_rtrn_type_d, wt_cache_pkg::DCACHE_LOAD_ACK, clk_i, rst_ni, clr_i)
+  `FFC(dcache_rtrn_type_q, dcache_rtrn_type_d, wt_cache_pkg::DCACHE_LOAD_ACK, clk_i, rst_ni, clr_i)
   `FFC(dcache_rtrn_inv_q, dcache_rtrn_inv_d, '0, clk_i, rst_ni, clr_i)
   `FFC(amo_off_q, amo_off_d, '0, clk_i, rst_ni, clr_i)
   `FFC(amo_gen_r_q, amo_gen_r_d, 1'b0, clk_i, rst_ni, clr_i)
