@@ -127,7 +127,7 @@ module cvxif_example_coprocessor import cvxif_pkg::*;
   ) counter_i(
     .clk_i      ( clk_i),
     .rst_ni     ( rst_ni),
-    .clr_i      ( clr_i),
+    .clr_i      ( 1'b0 ),
     .clear_i    ( ~x_commit_i.x_commit_kill && x_commit_valid_i ),
     .en_i       ( 1'b1 ),
     .load_i     (      ),
