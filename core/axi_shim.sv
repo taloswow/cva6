@@ -263,16 +263,6 @@ module axi_shim #(
   // ----------------
   // Registers
   // ----------------
-  always_ff @(posedge clk_i or negedge rst_ni) begin
-    if (~rst_ni) begin
-      // start in flushing state and initialize the memory
-      wr_state_q <= IDLE;
-      wr_cnt_q   <= '0;
-    end else begin
-      wr_state_q <= wr_state_d;
-      wr_cnt_q   <= wr_cnt_d;
-    end
-  end
   `FFC(wr_state_q, wr_state_d, IDLE, clk_i, rst_ni, clr_i)
   `FFC(wr_cnt_q, wr_cnt_d, '0, clk_i, rst_ni, clr_i)
 
