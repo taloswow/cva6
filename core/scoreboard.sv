@@ -370,7 +370,7 @@ module scoreboard #(
 
 
   // sequential process
-  `FFC(issue_cnt_q, issue_cn_n, '0, clk_i, rst_ni, clr_i)
+  `FFC(issue_cnt_q, issue_cnt_n, '0, clk_i, rst_ni, clr_i)
   `FFC(issue_pointer_q, issue_pointer_n, '0, clk_i, rst_ni, clr_i)
   `FFC(commit_pointer_q, commit_pointer_n, '0, clk_i, rst_ni, clr_i)
   `FFC(mem_q, mem_n, ('{default: sb_mem_t'(0)}), clk_i, rst_ni, clr_i)

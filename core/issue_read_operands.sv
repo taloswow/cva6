@@ -516,7 +516,7 @@ module issue_read_operands import ariane_pkg::*; #(
     // ----------------------
     // Registers (ID <-> EX)
     // ----------------------
-    `FFC(operant_a_q, operand_a_n, ('{default: 0}), clk_i, rst_ni, clr_i)
+    `FFC(operand_a_q, operand_a_n, ('{default: 0}), clk_i, rst_ni, clr_i)
     `FFC(operand_b_q, operand_b_n, ('{default: 0}), clk_i, rst_ni, clr_i)
     `FFC(imm_q, imm_n, '0, clk_i, rst_ni, clr_i)
     `FFC(fu_q, fu_n, NONE, clk_i, rst_ni, clr_i)

@@ -109,7 +109,7 @@ module cvxif_example_coprocessor import cvxif_pkg::*;
     ) fifo_commit_i (
     .clk_i        ( clk_i      ),
     .rst_ni       ( rst_ni     ),
-    .clr_i        ( clr_i      ),
+    .clr_i        ( 1'b0       ),
     .flush_i      ( 1'b0       ),
     .testmode_i   ( 1'b0       ),
     .full_o       ( fifo_full  ),
