@@ -547,6 +547,13 @@ axi_llc_top #(
 
   sram #(
     .DATA_WIDTH ( AXI_DATA_WIDTH ),
+    .USER_WIDTH ( AXI_USER_WIDTH ),
+    .USER_EN    ( AXI_USER_EN    ),
+`ifdef VERILATOR
+    .SIM_INIT   ( "none"         ),
+`else
+    .SIM_INIT   ( "zeros"        ),
+`endif
 `ifdef DROMAJO
     .DROMAJO_RAM (1),
 `endif
