@@ -26,6 +26,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input logic                  clk_i,
   input logic                  rst_ni,
+  input logic                  clr_i,
 
   // icache
   input  logic                 icache_data_req_i,
@@ -554,6 +555,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_axi_shim (
     .clk_i           ( clk_i             ),
     .rst_ni          ( rst_ni            ),
+    .clr_i           ( clr_i             ),
     .rd_req_i        ( axi_rd_req        ),
     .rd_gnt_o        ( axi_rd_gnt        ),
     .rd_addr_i       ( axi_rd_addr       ),

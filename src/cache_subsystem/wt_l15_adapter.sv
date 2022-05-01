@@ -54,6 +54,7 @@ module wt_l15_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input logic                  clk_i,
   input logic                  rst_ni,
+  input logic                  clr_i,
 
   // icache
   input  logic                 icache_data_req_i,

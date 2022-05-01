@@ -32,6 +32,7 @@ module cva6_icache import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
+  input  logic                      clr_i,
 
   // SRAM config
   input sram_cfg_t                  sram_cfg_data_i,

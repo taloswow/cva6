@@ -21,6 +21,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                                       clk_i,       // Clock
   input  logic                                       rst_ni,      // Asynchronous reset active low
+  input  logic                                       clr_i,       // Synchronous clear active high
   // cache management, signals from/to core
   input  logic                                       enable_i,    // from CSR
   input  logic                                       flush_i,     // flush request, this waits for pending tx (write, read) to finish and will clear the cache

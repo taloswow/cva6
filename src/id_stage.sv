@@ -16,6 +16,7 @@
 module id_stage (
     input  logic                          clk_i,
     input  logic                          rst_ni,
+    input  logic                          clr_i,
 
     input  logic                          flush_i,
     input  logic                          debug_req_i,

@@ -78,7 +78,9 @@ module ariane import ariane_pkg::*; #(
   (* mark_debug = "true" *) logic [riscv::VLEN-1:0]     pc_commit;
   logic                       eret;
   logic [NR_COMMIT_PORTS-1:0] commit_ack;
-  logic                       rst_uarch_n;
+  logic                       clr_i;
+
+  assign clr_i = 1'b0;
 
   // --------------
   // PCGEN <-> CSR
@@ -293,6 +295,7 @@ module ariane import ariane_pkg::*; #(
     .fetch_entry_o       ( fetch_entry_if_id             ),
     .fetch_entry_valid_o ( fetch_valid_if_id             ),
     .fetch_entry_ready_i ( fetch_ready_id_if             ),
+    .clr_i               ( clr_i                         ),
     .*
   );
 
@@ -301,7 +304,8 @@ module ariane import ariane_pkg::*; #(
   // ---------
   id_stage id_stage_i (
     .clk_i,
-    .rst_ni                     ( rst_uarch_n                ),
+    .rst_ni,
+    .clr_i,
     .flush_i                    ( flush_ctrl_if              ),
     .debug_req_i,
 
@@ -335,7 +339,7 @@ module ariane import ariane_pkg::*; #(
   ) issue_stage_i (
     .clk_i,
     .rst_ni,
-    .rst_uarch_ni               ( rst_uarch_n                  ),
+    .clr_i,
     .sb_full_o                  ( sb_full                      ),
     .flush_unissued_instr_i     ( flush_unissued_instr_ctrl_id ),
     .flush_i                    ( flush_ctrl_id                ),
@@ -394,7 +398,8 @@ module ariane import ariane_pkg::*; #(
     .ArianeCfg  ( ArianeCfg  )
   ) ex_stage_i (
     .clk_i                  ( clk_i                       ),
-    .rst_ni                 ( rst_uarch_n                 ),
+    .rst_ni                 ( rst_ni                      ),
+    .clr_i                  ( clr_i                       ),
     .debug_mode_i           ( debug_mode                  ),
     .flush_i                ( flush_ctrl_ex               ),
     .rs1_forwarding_i       ( rs1_forwarding_id_ex        ),
@@ -584,6 +589,7 @@ module ariane import ariane_pkg::*; #(
     .ipi_i,
     .irq_i,
     .time_irq_i,
+    .clr_i,
     .*
   );
   // ------------------------
@@ -673,15 +679,16 @@ module ariane import ariane_pkg::*; #(
   ) i_cache_subsystem (
     // to D$
     .clk_i                 ( clk_i                       ),
-    .rst_ni                ( rst_uarch_n                 ),
     .busy_o                ( busy_cache_ctrl             ),
     .stall_i               ( stall_ctrl_cache            ),
     .init_ni               ( init_ctrl_cache_n           ),
     // SRAM config
-    .sram_cfg_idata_i        ( sram_cfg_idata_i          ),
-    .sram_cfg_itag_i         ( sram_cfg_itag_i           ),
-    .sram_cfg_ddata_i        ( sram_cfg_ddata_i          ),
-    .sram_cfg_dtag_i         ( sram_cfg_dtag_i           ),
+    .sram_cfg_idata_i      ( sram_cfg_idata_i            ),
+    .sram_cfg_itag_i       ( sram_cfg_itag_i             ),
+    .sram_cfg_ddata_i      ( sram_cfg_ddata_i            ),
+    .sram_cfg_dtag_i       ( sram_cfg_dtag_i             ),
+    .rst_ni                ( rst_ni                      ),
+    .clr_i                 ( clr_i                       ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
     .icache_flush_i        ( icache_flush_ctrl_cache     ),
@@ -733,7 +740,8 @@ module ariane import ariane_pkg::*; #(
   ) i_cache_subsystem (
     // to D$
     .clk_i                 ( clk_i                       ),
-    .rst_ni                ( rst_uarch_n                 ),
+    .rst_ni                ( rst_ni                      ),
+    .clr_i                 ( clr_i                       ),
     .priv_lvl_i            ( priv_lvl                    ),
     .busy_o                ( busy_cache_ctrl             ),
     .stall_i               ( stall_ctrl_cache            ),

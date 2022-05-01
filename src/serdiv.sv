@@ -20,6 +20,7 @@ module serdiv import ariane_pkg::*; #(
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
+  input  logic                      clr_i,
   // input IF
   input  logic [TRANS_ID_BITS-1:0]  id_i,
   input  logic [WIDTH-1:0]          op_a_i,

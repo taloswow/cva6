@@ -16,6 +16,7 @@
 module fpu_wrap import ariane_pkg::*; (
   input  logic                     clk_i,
   input  logic                     rst_ni,
+  input  logic                     clr_i,
   input  logic                     flush_i,
   input  logic                     fpu_valid_i,
   output logic                     fpu_ready_o,
@@ -518,6 +519,7 @@ module fpu_wrap import ariane_pkg::*; (
     ) i_fpnew_bulk (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .operands_i     ( fpu_operands                        ),
       .rnd_mode_i     ( fpnew_pkg::roundmode_e'(fpu_rm)     ),
       .op_i           ( fpnew_pkg::operation_e'(fpu_op)     ),

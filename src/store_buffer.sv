@@ -17,6 +17,7 @@
 module store_buffer import ariane_pkg::*; (
     input logic          clk_i,           // Clock
     input logic          rst_ni,          // Asynchronous reset active low
+    input logic          clr_i,           // Synchronous clear active high
     input logic          flush_i,         // if we flush we need to pause the transactions on the memory
                                           // otherwise we will run in a deadlock with the memory arbiter
     output logic         no_st_pending_o, // non-speculative queue is empty (e.g.: everything is committed to the memory hierarchy)

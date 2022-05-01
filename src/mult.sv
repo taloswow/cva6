@@ -3,6 +3,7 @@
 module mult import ariane_pkg::*; (
     input  logic                     clk_i,
     input  logic                     rst_ni,
+    input  logic                     clr_i,
     input  logic                     flush_i,
     input  fu_data_t                 fu_data_i,
     input  logic                     mult_valid_i,
@@ -42,6 +43,7 @@ module mult import ariane_pkg::*; (
     multiplier i_multiplier (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .trans_id_i        ( fu_data_i.trans_id  ),
         .operator_i        ( fu_data_i.operator  ),
         .operand_a_i       ( fu_data_i.operand_a ),
@@ -108,6 +110,7 @@ module mult import ariane_pkg::*; (
     ) i_div (
         .clk_i       ( clk_i                ),
         .rst_ni      ( rst_ni               ),
+	.clr_i       ( clr_i                ),
         .id_i        ( fu_data_i.trans_id   ),
         .op_a_i      ( operand_a            ),
         .op_b_i      ( operand_b            ),

@@ -29,6 +29,7 @@ module axi_adapter #(
 )(
   input  logic                             clk_i,  // Clock
   input  logic                             rst_ni, // Asynchronous reset active low
+  input  logic                             clr_i,  // Synchronous clear active high
 
   output logic                             busy_o,
   input  logic                             req_i,

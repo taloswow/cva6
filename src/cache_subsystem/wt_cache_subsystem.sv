@@ -31,6 +31,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                           clk_i,
   input  logic                           rst_ni,
+  input  logic                           clr_i,
   output logic                           busy_o,
   input  logic                           stall_i,                // stall new memory requests
   input  logic                           init_ni,
@@ -98,6 +99,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_cva6_icache (
     .clk_i              ( clk_i                   ),
     .rst_ni             ( rst_ni                  ),
+    .clr_i              ( clr_i                   ),
     .flush_i            ( icache_flush_i          ),
     .sram_cfg_data_i    ( sram_cfg_idata_i        ),
     .sram_cfg_tag_i     ( sram_cfg_itag_i         ),
@@ -131,6 +133,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_wt_dcache (
     .clk_i           ( clk_i                   ),
     .rst_ni          ( rst_ni                  ),
+    .clr_i           ( clr_i                   ),
     .sram_cfg_data_i ( sram_cfg_ddata_i        ),
     .sram_cfg_tag_i  ( sram_cfg_dtag_i         ),
     .enable_i        ( dcache_enable_i         ),
@@ -165,6 +168,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_adapter (
     .clk_i              ( clk_i                   ),
     .rst_ni             ( rst_ni                  ),
+    .clr_i              ( clr_i                   ),
     .icache_data_req_i  ( icache_adapter_data_req ),
     .icache_data_ack_o  ( adapter_icache_data_ack ),
     .icache_data_i      ( icache_adapter          ),
@@ -189,6 +193,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_adapter (
     .clk_i              ( clk_i                   ),
     .rst_ni             ( rst_ni                  ),
+    .clr_i              ( clr_i                   ),
     .icache_data_req_i  ( icache_adapter_data_req ),
     .icache_data_ack_o  ( adapter_icache_data_ack ),
     .icache_data_i      ( icache_adapter          ),

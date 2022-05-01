@@ -24,6 +24,7 @@ module tag_cmp #(
 ) (
     input  logic                                          clk_i,
     input  logic                                          rst_ni,
+    input  logic                                          clr_i,
 
     input  logic    [NR_PORTS-1:0][DCACHE_SET_ASSOC-1:0]             req_i,
     output logic    [NR_PORTS-1:0]                                   gnt_o,

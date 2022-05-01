@@ -25,6 +25,7 @@ module std_nbdcache import std_cache_pkg::*; import ariane_pkg::*; #(
 )(
     input  logic                           clk_i,       // Clock
     input  logic                           rst_ni,      // Asynchronous reset active low
+    input  logic                           clr_i,       // Synchronous clear active high
     // SRAM config
     input sram_cfg_t                       sram_cfg_data_i,
     input sram_cfg_t                       sram_cfg_tag_i,
@@ -138,6 +139,8 @@ import std_cache_pkg::*;
                 .mshr_addr_o           ( mshr_addr         [i] ),
                 .mshr_addr_matches_i   ( mshr_addr_matches [i] ),
                 .mshr_index_matches_i  ( mshr_index_matches[i] ),
+
+		.clr_i                 ( clr_i                 ),
                 .*
             );
         end
@@ -157,6 +160,7 @@ import std_cache_pkg::*;
     ) i_miss_handler (
         .busy_o                 ( miss_handler_busy    ),
         .flush_i                ( flush_i              ),
+	.clr_i                  ( clr_i                ),
         .busy_i                 ( |busy                ),
         .hart_id_i              ( hart_id_i            ),
         // AMOs
@@ -288,6 +292,8 @@ import std_cache_pkg::*;
         .we_o               ( we_ram      ),
         .be_o               ( be_ram      ),
         .rdata_i            ( rdata_ram   ),
+
+	.clr_i              ( clr_i       ),
         .*
     );
 

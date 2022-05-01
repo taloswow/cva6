@@ -28,6 +28,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     input  logic                                        clk_i,
     input  logic                                        rst_ni,
     output logic                                        busy_o,       // miss handler or axi is busy
+    input  logic                                        clr_i,
     input  logic                                        flush_i,      // flush request
     output logic                                        flush_ack_o,  // acknowledge successful flush
     output logic                                        miss_o,
@@ -585,6 +586,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
         .clk_i                (clk_i),
         .rst_ni               (rst_ni),
         .busy_o               (bypass_axi_busy),
+	.clr_i                (clr_i),
         .req_i                (bypass_adapter_req.req),
         .type_i               (bypass_adapter_req.reqtype),
         .amo_i                (bypass_adapter_req.amo),
@@ -621,6 +623,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
         .clk_i,
         .rst_ni,
         .busy_o              ( miss_axi_busy      ),
+	.clr_i,
         .req_i               ( req_fsm_miss_valid ),
         .type_i              ( req_fsm_miss_req   ),
         .amo_i               ( AMO_NONE           ),

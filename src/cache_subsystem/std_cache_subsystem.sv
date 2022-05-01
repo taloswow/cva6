@@ -30,6 +30,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
 ) (
     input  logic                           clk_i,
     input  logic                           rst_ni,
+    input  logic                           clr_i,
     input  riscv::priv_lvl_t               priv_lvl_i,
     output logic                           busy_o,
     input  logic                           stall_i,                // stall new memory requests
@@ -95,6 +96,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_cva6_icache_axi_wrapper (
         .clk_i      ( clk_i                 ),
         .rst_ni     ( rst_ni                ),
+	.clr_i      ( clr_i                 ),
         .priv_lvl_i ( priv_lvl_i            ),
         .sram_cfg_data_i ( sram_cfg_idata_i ),
         .sram_cfg_tag_i  ( sram_cfg_itag_i  ),
@@ -131,6 +133,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
       .sram_cfg_data_i ( sram_cfg_ddata_i    ),
       .sram_cfg_tag_i  ( sram_cfg_dtag_i     ),
       .sram_cfg_valid_dirty_i ( sram_cfg_dvalid_dirty_i ),
+      .clr_i,
       .enable_i     ( dcache_enable_i        ),
       .flush_i      ( dcache_flush_i         ),
       .flush_ack_o  ( dcache_flush_ack_o     ),

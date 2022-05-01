@@ -21,6 +21,7 @@ module csr_regfile import ariane_pkg::*; #(
 ) (
     input  logic                  clk_i,                      // Clock
     input  logic                  rst_ni,                     // Asynchronous reset active low
+    input  logic                  clr_i,                      // Synchronous clear active high
     input  logic                  time_irq_i,                 // Timer threw a interrupt
     // send a flush request out if a CSR with a side effect has changed (e.g. written)
     output logic                  flush_o,
