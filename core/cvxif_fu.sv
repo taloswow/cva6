@@ -13,6 +13,7 @@
 module cvxif_fu import ariane_pkg::*; (
     input  logic                              clk_i,
     input  logic                              rst_ni,
+    input  logic                              clr_i,
     input  fu_data_t                          fu_data_i,
     //from issue
     input  logic                              x_valid_i,

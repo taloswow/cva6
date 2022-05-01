@@ -16,6 +16,7 @@
 module controller import ariane_pkg::*; (
     input  logic            clk_i,
     input  logic            rst_ni,
+    input  logic            clr_i,
     output logic            set_pc_commit_o,        // Set PC om PC Gen
     output logic            flush_if_o,             // Flush the IF stage
     output logic            flush_unissued_instr_o, // Flush un-issued instructions of the scoreboard

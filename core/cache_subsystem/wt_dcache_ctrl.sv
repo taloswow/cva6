@@ -19,6 +19,7 @@ module wt_dcache_ctrl import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                            clk_i,          // Clock
   input  logic                            rst_ni,         // Asynchronous reset active low
+  input  logic                            clr_i,          // Synchronous clear active high
   input  logic                            cache_en_i,
   // core request ports
   input  dcache_req_i_t                   req_port_i,

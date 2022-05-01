@@ -19,6 +19,7 @@ module scoreboard #(
 ) (
   input  logic                                                  clk_i,    // Clock
   input  logic                                                  rst_ni,   // Asynchronous reset active low
+  input  logic                                                  clr_i,    // Synchronous clear active high
   output logic                                                  sb_full_o,
   input  logic                                                  flush_unissued_instr_i, // flush only un-issued instructions
   input  logic                                                  flush_i,  // flush whole scoreboard

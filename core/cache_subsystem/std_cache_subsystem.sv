@@ -20,6 +20,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
 ) (
     input logic                            clk_i,
     input logic                            rst_ni,
+    input logic                            clr_i,
     input riscv::priv_lvl_t                priv_lvl_i,
     // I$
     input  logic                           icache_en_i,            // enable icache (or bypass e.g: in debug mode)
@@ -63,6 +64,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_cva6_icache_axi_wrapper (
         .clk_i      ( clk_i                 ),
         .rst_ni     ( rst_ni                ),
+	.clr_i      ( clr_i                 ),
         .priv_lvl_i ( priv_lvl_i            ),
         .flush_i    ( icache_flush_i        ),
         .en_i       ( icache_en_i           ),
@@ -84,6 +86,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
    ) i_nbdcache (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .enable_i     ( dcache_enable_i        ),
       .flush_i      ( dcache_flush_i         ),
       .flush_ack_o  ( dcache_flush_ack_o     ),

@@ -31,6 +31,7 @@ module cva6_icache import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
+  input  logic                      clr_i,
 
   input  logic                      flush_i,              // flush the icache, flush and kill have to be asserted together
   input  logic                      en_i,                 // enable icache

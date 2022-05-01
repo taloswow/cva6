@@ -32,6 +32,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                                              clk_i,
   input  logic                                              rst_ni,
+  input  logic                                              clr_i,
 
   // ports
   input  logic  [NumPorts-1:0][DCACHE_TAG_WIDTH-1:0]        rd_tag_i,           // tag in - comes one cycle later

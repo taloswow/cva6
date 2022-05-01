@@ -23,6 +23,7 @@ module cache_ctrl import ariane_pkg::*; import std_cache_pkg::*; #(
 ) (
     input  logic                                 clk_i,     // Clock
     input  logic                                 rst_ni,    // Asynchronous reset active low
+    input  logic                                 clr_i,     // Synchronous clear active high
     input  logic                                 flush_i,
     input  logic                                 bypass_i,  // enable cache
     output logic                                 busy_o,

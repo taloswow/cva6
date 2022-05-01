@@ -18,6 +18,7 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic              clk_i,
   input  logic              rst_ni,
+  input  logic              clr_i,
   input riscv::priv_lvl_t   priv_lvl_i,
 
   input  logic              flush_i,     // flush the icache, flush and kill have to be asserted together
@@ -100,6 +101,7 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_cva6_icache (
     .clk_i              ( clk_i               ),
     .rst_ni             ( rst_ni              ),
+    .clr_i              ( clr_i               ),
     .flush_i            ( flush_i             ),
     .en_i               ( en_i                ),
     .miss_o             ( miss_o              ),
@@ -123,6 +125,7 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_axi_shim (
     .clk_i           ( clk_i             ),
     .rst_ni          ( rst_ni            ),
+    .clr_i           ( clr_i             ),
     .rd_req_i        ( axi_rd_req        ),
     .rd_gnt_o        ( axi_rd_gnt        ),
     .rd_addr_i       ( axi_rd_addr       ),

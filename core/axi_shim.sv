@@ -25,6 +25,7 @@ module axi_shim #(
 ) (
   input  logic                            clk_i,  // Clock
   input  logic                            rst_ni, // Asynchronous reset active low
+  input  logic                            clr_i,  // Synchronous clear active high
   // read channel
   // request
   input  logic                            rd_req_i,

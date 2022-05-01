@@ -18,6 +18,7 @@
 module multiplier import ariane_pkg::*; (
     input  logic                     clk_i,
     input  logic                     rst_ni,
+    input  logic                     clr_i,
     input  logic [TRANS_ID_BITS-1:0] trans_id_i,
     input  logic                     mult_valid_i,
     input  fu_op                     operator_i,

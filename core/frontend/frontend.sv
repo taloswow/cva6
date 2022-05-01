@@ -20,6 +20,7 @@ module frontend import ariane_pkg::*; #(
 ) (
   input  logic               clk_i,              // Clock
   input  logic               rst_ni,             // Asynchronous reset active low
+  input  logic               clr_i,
   input  logic               flush_i,            // flush request for PCGEN
   input  logic               flush_bp_i,         // flush branch prediction
   input  logic               debug_mode_i,

@@ -21,6 +21,7 @@ module issue_stage import ariane_pkg::*; #(
 )(
     input  logic                                     clk_i,     // Clock
     input  logic                                     rst_ni,    // Asynchronous reset active low
+    input  logic                                     clr_i,     // Synchronous clear active high
 
     output logic                                     sb_full_o,
     input  logic                                     flush_unissued_instr_i,
@@ -154,6 +155,8 @@ module issue_stage import ariane_pkg::*; #(
         .trans_id_i            ( trans_id_i                                ),
         .wbdata_i              ( wbdata_i                                  ),
         .ex_i                  ( ex_ex_i                                   ),
+
+	.clr_i                 ( clr_i                                     ),
         .*
     );
 

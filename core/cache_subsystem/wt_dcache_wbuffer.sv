@@ -54,6 +54,7 @@ module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                               clk_i,          // Clock
   input  logic                               rst_ni,         // Asynchronous reset active low
+  input  logic                               clr_i,          // Synchronous clear active high
 
   input  logic                               cache_en_i,     // writes are treated as NC if disabled
   output logic                               empty_o,        // asserted if no data is present in write buffer
