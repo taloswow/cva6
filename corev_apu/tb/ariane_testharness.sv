@@ -419,6 +419,7 @@ module ariane_testharness #(
   ) i_axi_delayer (
     .clk_i  ( clk_i        ),
     .rst_ni ( ndmreset_n   ),
+    .clr_i  ( 1'b0         ),
     .slv    ( dram         ),
     .mst    ( dram_delayed )
   );
