@@ -624,6 +624,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
         .en_i           ( lfsr_enable ),
         .refill_way_oh  ( lfsr_oh     ),
         .refill_way_bin ( lfsr_bin    ),
+	.clr_i          ( clr_i       ),
         .*
     );
 
