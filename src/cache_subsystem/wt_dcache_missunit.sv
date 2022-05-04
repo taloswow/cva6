@@ -160,6 +160,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_lfsr_inv (
     .clk_i          ( clk_i       ),
     .rst_ni         ( rst_ni      ),
+    .clr_i          ( clr_i       ),
     .en_i           ( update_lfsr ),
     .refill_way_oh  (             ),
     .refill_way_bin ( rnd_way     )
