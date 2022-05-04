@@ -376,6 +376,7 @@ end else begin : gen_piton_offset
   ) i_lfsr (
     .clk_i          ( clk_i       ),
     .rst_ni         ( rst_ni      ),
+    .clr_i          ( clr_i       ),
     .en_i           ( update_lfsr ),
     .out_o          ( rnd_way     )
   );
