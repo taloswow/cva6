@@ -7,17 +7,17 @@
 [submodule "src/fpga-support"]
 	path = src/fpga-support
 	url = https://github.com/pulp-platform/fpga-support.git
-[submodule "src/common_cells"]
-	path = src/common_cells
-	url = https://github.com/pulp-platform/common_cells.git
-[submodule "src/axi"]
-	path = src/axi
-	url = https://github.com/pulp-platform/axi.git
-[submodule "src/register_interface"]
-	path = src/register_interface
-	url = https://github.com/pulp-platform/register_interface.git
-[submodule "fpga/src/apb_uart"]
-	path = fpga/src/apb_uart
+[submodule "common/submodules/common_cells"]
+	path = common/submodules/common_cells
+	url = https://github.com/taloswow/common_cells.git
+[submodule "corev_apu/axi"]
+	path = corev_apu/axi
+	url = https://github.com/taloswow/axi.git
+[submodule "corev_apu/register_interface"]
+	path = corev_apu/register_interface
+	url = https://github.com/taloswow/register_interface.git
+[submodule "corev_apu/fpga/src/apb_uart"]
+	path = corev_apu/fpga/src/apb_uart
 	url = https://github.com/pulp-platform/apb_uart.git
 [submodule "fpga/src/apb_node"]
 	path = fpga/src/apb_node
