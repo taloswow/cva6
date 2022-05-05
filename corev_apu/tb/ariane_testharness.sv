@@ -285,7 +285,6 @@ module ariane_testharness #(
   ) i_dm_axi_master (
     .clk_i                 ( clk_i                     ),
     .rst_ni                ( rst_ni                    ),
-    .clr_i                 ( 1'b0                      ),
     .req_i                 ( dm_master_req             ),
     .type_i                ( ariane_axi::SINGLE_REQ    ),
     .amo_i                 ( ariane_pkg::AMO_NONE      ),
@@ -419,7 +418,6 @@ module ariane_testharness #(
   ) i_axi_delayer (
     .clk_i  ( clk_i        ),
     .rst_ni ( ndmreset_n   ),
-    .clr_i  ( 1'b0         ),
     .slv    ( dram         ),
     .mst    ( dram_delayed )
   );

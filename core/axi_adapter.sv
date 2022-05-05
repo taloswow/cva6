@@ -24,7 +24,6 @@ module axi_adapter #(
 )(
   input  logic                             clk_i,  // Clock
   input  logic                             rst_ni, // Asynchronous reset active low
-  input  logic                             clr_i,  // Synchronous clear active high
 
   input  logic                             req_i,
   input  ariane_axi::ad_req_t              type_i,
