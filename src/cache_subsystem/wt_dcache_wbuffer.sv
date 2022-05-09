@@ -205,6 +205,7 @@ module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rtrn_id_fifo (
     .clk_i      ( clk_i            ),
     .rst_ni     ( rst_ni           ),
+    .clr_i      ( clr_i            ),
     .flush_i    ( 1'b0             ),
     .testmode_i ( 1'b0             ),
     .full_o     (                  ),

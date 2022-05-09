@@ -67,6 +67,7 @@ module amo_buffer (
     ) i_amo_fifo (
         .clk_i        ( clk_i            ),
         .rst_ni       ( rst_ni           ),
+	.clr_i        ( clr_i            ),
         .flush_i      ( flush_amo_buffer ),
         .testmode_i   ( 1'b0             ),
         .full_o       ( amo_valid        ),

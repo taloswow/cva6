@@ -211,6 +211,7 @@ module std_cache_subsystem import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_fifo_w_channel (
       .clk_i      ( clk_i           ),
       .rst_ni     ( rst_ni          ),
+      .clr_i      ( clr_i           ),
       .flush_i    ( 1'b0            ),
       .testmode_i ( 1'b0            ),
       .full_o     (                 ), // leave open

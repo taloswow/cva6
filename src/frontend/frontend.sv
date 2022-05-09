@@ -422,6 +422,7 @@ module frontend import ariane_pkg::*; #(
     instr_queue i_instr_queue (
       .clk_i               ( clk_i                ),
       .rst_ni              ( rst_ni               ),
+      .clr_i               ( clr_i                ),
       .flush_i             ( flush_i              ),
       .instr_i             ( instr                ), // from re-aligner
       .addr_i              ( addr                 ), // from re-aligner

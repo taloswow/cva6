@@ -46,6 +46,7 @@
 module instr_queue (
   input  logic                                               clk_i,
   input  logic                                               rst_ni,
+  input  logic                                               clr_i,
   input  logic                                               flush_i,
   input  logic [ariane_pkg::INSTR_PER_FETCH-1:0][31:0]       instr_i,
   input  logic [ariane_pkg::INSTR_PER_FETCH-1:0][riscv::VLEN-1:0] addr_i,
@@ -282,6 +283,7 @@ module instr_queue (
     ) i_fifo_instr_data (
       .clk_i      ( clk_i                ),
       .rst_ni     ( rst_ni               ),
+      .clr_i      ( clr_i                ),
       .flush_i    ( flush_i              ),
       .testmode_i ( 1'b0                 ),
       .full_o     ( instr_queue_full[i]  ),
@@ -309,6 +311,7 @@ module instr_queue (
   ) i_fifo_address (
     .clk_i      ( clk_i                        ),
     .rst_ni     ( rst_ni                       ),
+    .clr_i      ( clr_i                        ),
     .flush_i    ( flush_i                      ),
     .testmode_i ( 1'b0                         ),
     .full_o     ( full_address                 ),

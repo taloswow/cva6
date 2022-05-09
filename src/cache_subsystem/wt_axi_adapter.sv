@@ -243,6 +243,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_icache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  icache_data_full        ),
@@ -260,6 +261,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_dcache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  dcache_data_full        ),
@@ -284,6 +286,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rd_icache_id (
     .clk_i      ( clk_i                   ),
     .rst_ni     ( rst_ni                  ),
+    .clr_i      ( clr_i                   ),
     .flush_i    ( 1'b0                    ),
     .testmode_i ( 1'b0                    ),
     .full_o     ( icache_rd_full          ),
@@ -301,6 +304,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rd_dcache_id (
     .clk_i      ( clk_i                   ),
     .rst_ni     ( rst_ni                  ),
+    .clr_i      ( clr_i                   ),
     .flush_i    ( 1'b0                    ),
     .testmode_i ( 1'b0                    ),
     .full_o     ( dcache_rd_full          ),
@@ -318,6 +322,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_wr_dcache_id (
     .clk_i      ( clk_i                   ),
     .rst_ni     ( rst_ni                  ),
+    .clr_i      ( clr_i                   ),
     .flush_i    ( 1'b0                    ),
     .testmode_i ( 1'b0                    ),
     .full_o     ( dcache_wr_full          ),
@@ -348,6 +353,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_b_fifo (
     .clk_i      ( clk_i      ),
     .rst_ni     ( rst_ni     ),
+    .clr_i      ( clr_i      ),
     .flush_i    ( 1'b0       ),
     .testmode_i ( 1'b0       ),
     .full_o     ( b_full     ),

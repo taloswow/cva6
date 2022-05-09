@@ -194,6 +194,7 @@ l15_rtrn_t rtrn_fifo_data;
     ) i_icache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  icache_data_full        ),
@@ -212,6 +213,7 @@ l15_rtrn_t rtrn_fifo_data;
     ) i_dcache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  dcache_data_full        ),
@@ -329,6 +331,7 @@ l15_rtrn_t rtrn_fifo_data;
   ) i_rtrn_fifo (
     .clk_i       (  clk_i                    ),
     .rst_ni      (  rst_ni                   ),
+    .clr_i       (  clr_i                    ),
     .flush_i     (  1'b0                     ),
     .testmode_i  (  1'b0                     ),
     .full_o      (  rtrn_fifo_full           ),
