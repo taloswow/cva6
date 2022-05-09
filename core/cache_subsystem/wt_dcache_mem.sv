@@ -141,6 +141,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rr_arb_tree (
     .clk_i  (clk_i   ),
     .rst_ni (rst_ni  ),
+    .clr_i  (clr_i   ),
     .flush_i('0      ),
     .rr_i   ('0      ),
     .req_i  (rd_req_masked ),

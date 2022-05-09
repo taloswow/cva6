@@ -143,6 +143,7 @@ l15_rtrn_t rtrn_fifo_data;
   ) i_rrarbiter (
     .clk_i  ( clk_i                ),
     .rst_ni ( rst_ni               ),
+    .clr_i  ( clr_i                ),
     .flush_i( '0                   ),
     .en_i   ( l15_rtrn_i.l15_ack   ),
     .req_i  ( arb_req              ),
