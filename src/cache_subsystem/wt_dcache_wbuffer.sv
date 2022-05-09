@@ -255,6 +255,7 @@ module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_tx_id_rr (
     .clk_i  (clk_i       ),
     .rst_ni (rst_ni      ),
+    .clr_i  (clr_i       ),
     .flush_i('0          ),
     .rr_i   ('0          ),
     .req_i  (~tx_vld_o   ),
@@ -355,6 +356,7 @@ module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_dirty_rr (
     .clk_i  ( clk_i             ),
     .rst_ni ( rst_ni            ),
+    .clr_i  ( clr_i             ),
     .flush_i( '0                ),
     .rr_i   ( '0                ),
     .req_i  ( dirty             ),
@@ -373,6 +375,7 @@ module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_clean_rr (
     .clk_i  ( clk_i             ),
     .rst_ni ( rst_ni            ),
+    .clr_i  ( clr_i             ),
     .flush_i( '0                ),
     .rr_i   ( '0                ),
     .req_i  ( tocheck           ),
