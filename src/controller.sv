@@ -12,6 +12,7 @@
 // Date: 08.05.2017
 // Description: Flush controller
 
+`include "common_cells/registers.svh"
 
 module controller import ariane_pkg::*; (
     input  logic            clk_i,
@@ -312,26 +313,13 @@ module controller import ariane_pkg::*; (
     // ----------------------
     // Registers
     // ----------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            fence_t_state_q <= IDLE;
-            rst_uarch_cnt_q <= 4'b0;
-            fence_active_q  <= 1'b0;
-            flush_dcache_o  <= 1'b0;
-            rst_addr_q      <= boot_addr_i;
-            time_irq_q      <= 1'b0;
-            priv_lvl_q      <= riscv::PRIV_LVL_M;
-            cache_init_q    <= '0;
-        end else begin
-            fence_t_state_q <= fence_t_state_d;
-            fence_active_q  <= fence_active_d;
-            rst_uarch_cnt_q <= rst_uarch_cnt_d;
-            // register on the flush signal, this signal might be critical
-            flush_dcache_o  <= flush_dcache;
-            rst_addr_q      <= rst_addr_d;
-            time_irq_q      <= time_irq_i;
-            priv_lvl_q      <= priv_lvl_i;
-            cache_init_q    <= cache_init_d;
-        end
-    end
+    `FFC(fence_active_q, fence_active_d, 1'b0, clk_i, rst_ni, clr_i)
+     // register on the flush signal, this signal might be critical
+    `FFC(flush_dcache_o, flush_dcache, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(fence_t_state_q, fence_t_state_d, IDLE, clk_i, rst_ni, clr_i)
+    `FFC(rst_uarch_cnt_q, rst_uarch_cnt_d, 4'b0, clk_i, rst_ni, clr_i)
+    `FFC(rst_addr_q, rst_addr_d, boot_addr_i, clk_i, rst_ni, clr_i)
+    `FFC(time_irq_q, time_irq_i, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(priv_lvl_q, priv_lvl_i, riscv::PRIV_LVL_M, clk_i, rst_ni, clr_i)
+    `FFC(cache_init_q, cache_init_d, '0, clk_i, rst_ni, clr_i)
 endmodule
