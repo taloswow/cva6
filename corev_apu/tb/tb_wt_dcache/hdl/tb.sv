@@ -274,6 +274,7 @@ module tb import tb_pkg::*; import ariane_pkg::*; import wt_cache_pkg::*; #()();
       ) i_resp_fifo (
         .clk_i       ( clk_i            ),
         .rst_ni      ( rst_ni           ),
+	.clr_i       ( 1'b0             ),
         .flush_i     ( fifo_flush[k]    ),
         .testmode_i  ( '0               ),
         .full_o      (                  ),

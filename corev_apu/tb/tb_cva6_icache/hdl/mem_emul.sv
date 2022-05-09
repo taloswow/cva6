@@ -185,6 +185,7 @@ module mem_emul import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_outfifo (
     .clk_i       ( clk_i         ),
     .rst_ni      ( rst_ni        ),
+    .clr_i       ( 1'b0          ),
     .flush_i     ( 1'b0          ),
     .testmode_i  ( 1'b0          ),
     .full_o      ( outfifo_full  ),
@@ -205,6 +206,7 @@ module mem_emul import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_infifo (
     .clk_i       ( clk_i         ),
     .rst_ni      ( rst_ni        ),
+    .clr_i       ( 1'b0          ),
     .flush_i     ( 1'b0          ),
     .testmode_i  ( 1'b0          ),
     .full_o      ( infifo_full   ),
@@ -226,6 +228,7 @@ module mem_emul import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_stimuli_fifo (
     .clk_i       ( clk_i         ),
     .rst_ni      ( rst_ni        ),
+    .clr_i       ( clr_i         ),
     .flush_i     ( stim_flush_i  ),
     .testmode_i  ( 1'b0          ),
     .full_o      ( stim_full_o   ),
