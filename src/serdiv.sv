@@ -14,6 +14,7 @@
 // Date: 18.10.2018
 // Description: simple 64bit serial divider
 
+`include "common_cells/registers.svh"
 
 module serdiv import ariane_pkg::*; #(
   parameter WIDTH       = 64
@@ -226,32 +227,16 @@ module serdiv import ariane_pkg::*; #(
   assign res_d    = (load_en)   ? '0       :
                     (res_reg_en) ? {res_q[$high(res_q)-1:0], ab_comp} : res_q;
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
-    if (~rst_ni) begin
-      state_q        <= IDLE;
-      op_a_q         <= '0;
-      op_b_q         <= '0;
-      res_q          <= '0;
-      cnt_q          <= '0;
-      id_q           <= '0;
-      rem_sel_q      <= 1'b0;
-      comp_inv_q     <= 1'b0;
-      res_inv_q      <= 1'b0;
-      op_b_zero_q    <= 1'b0;
-      div_res_zero_q <= 1'b0;
-    end else begin
-      state_q        <= state_d;
-      op_a_q         <= op_a_d;
-      op_b_q         <= op_b_d;
-      res_q          <= res_d;
-      cnt_q          <= cnt_d;
-      id_q           <= id_d;
-      rem_sel_q      <= rem_sel_d;
-      comp_inv_q     <= comp_inv_d;
-      res_inv_q      <= res_inv_d;
-      op_b_zero_q    <= op_b_zero_d;
-      div_res_zero_q <= div_res_zero_d;
-    end
-  end
+  `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+  `FFC(op_a_q, op_a_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(op_b_q, op_b_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(res_q, res_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(cnt_q, cnt_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(id_q, id_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(rem_sel_q, rem_sel_d, 1'b0, clk_i, rst_ni, clr_i)
+  `FFC(comp_inv_q, comp_inv_d, 1'b0, clk_i, rst_ni, clr_i)
+  `FFC(res_inv_q, res_inv_d, 1'b0, clk_i, rst_ni, clr_i)
+  `FFC(op_b_zero_q, op_b_zero_d, 1'b0, clk_i, rst_ni, clr_i)
+  `FFC(div_res_zero_q, div_res_zero_d, 1'b0, clk_i, rst_ni, clr_i)
 
 endmodule
