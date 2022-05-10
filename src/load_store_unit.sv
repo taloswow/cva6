@@ -12,6 +12,7 @@
 // Date: 19.04.2017
 // Description: Load Store Unit, handles address calculation and memory interface signals
 
+`include "common_cells/registers.svh"
 
 module load_store_unit import ariane_pkg::*; #(
     parameter int unsigned ASID_WIDTH = 1,
@@ -414,6 +415,7 @@ endmodule
 module lsu_bypass import ariane_pkg::*; (
     input  logic      clk_i,
     input  logic      rst_ni,
+    input  logic      clr_i,
     input  logic      flush_i,
 
     input  lsu_ctrl_t lsu_req_i,
@@ -490,18 +492,9 @@ module lsu_bypass import ariane_pkg::*; (
     end
 
     // registers
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            mem_q           <= '0;
-            status_cnt_q    <= '0;
-            write_pointer_q <= '0;
-            read_pointer_q  <= '0;
-        end else begin
-            mem_q           <= mem_n;
-            status_cnt_q    <= status_cnt_n;
-            write_pointer_q <= write_pointer_n;
-            read_pointer_q  <= read_pointer_n;
-        end
-    end
+    `FFC(mem_q, mem_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(status_cnt_q, status_cnt_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(write_pointer_q, write_pointer_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(read_pointer_q, read_pointer_n, '0, clk_i, rst_ni, clr_i)
 endmodule
 
