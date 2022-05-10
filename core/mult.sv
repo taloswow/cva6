@@ -1,4 +1,4 @@
-
+`include "common_cells/registers.svh"
 
 module mult import ariane_pkg::*; (
     input  logic                     clk_i,
@@ -131,11 +131,5 @@ module mult import ariane_pkg::*; (
     // ---------------------
     // Registers
     // ---------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if(~rst_ni) begin
-            word_op_q <= '0;
-        end else begin
-            word_op_q <= word_op_d;
-        end
-    end
+    `FFC(word_op_q, word_op_d, '0, clk_i, rst_ni, clr_i)
 endmodule
