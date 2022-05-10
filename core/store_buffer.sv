@@ -13,6 +13,7 @@
 // Description: Store queue persists store requests and pushes them to memory
 //              if they are no longer speculative
 
+`include "common_cells/registers.svh"
 
 module store_buffer import ariane_pkg::*; (
     input logic          clk_i,           // Clock
@@ -221,34 +222,16 @@ module store_buffer import ariane_pkg::*; (
 
 
     // registers
-    always_ff @(posedge clk_i or negedge rst_ni) begin : p_spec
-        if (~rst_ni) begin
-            speculative_queue_q         <= '{default: 0};
-            speculative_read_pointer_q  <= '0;
-            speculative_write_pointer_q <= '0;
-            speculative_status_cnt_q    <= '0;
-        end else begin
-            speculative_queue_q         <= speculative_queue_n;
-            speculative_read_pointer_q  <= speculative_read_pointer_n;
-            speculative_write_pointer_q <= speculative_write_pointer_n;
-            speculative_status_cnt_q    <= speculative_status_cnt_n;
-        end
-     end
+     `FFC(speculative_queue_q, speculative_queue_n, '{default: 0}, clk_i, rst_ni, clr_i)
+     `FFC(speculative_read_pointer_q, speculative_read_pointer_n, '0, clk_i, rst_ni, clr_i)
+     `FFC(speculative_write_pointer_q, speculative_write_pointer_n, '0, clk_i, rst_ni, clr_i)
+     `FFC(speculative_status_cnt_q, speculative_status_cnt_n ,'0, clk_i, rst_ni, clr_i)
 
     // registers
-    always_ff @(posedge clk_i or negedge rst_ni) begin : p_commit
-        if (~rst_ni) begin
-            commit_queue_q              <= '{default: 0};
-            commit_read_pointer_q       <= '0;
-            commit_write_pointer_q      <= '0;
-            commit_status_cnt_q         <= '0;
-        end else begin
-            commit_queue_q              <= commit_queue_n;
-            commit_read_pointer_q       <= commit_read_pointer_n;
-            commit_write_pointer_q      <= commit_write_pointer_n;
-            commit_status_cnt_q         <= commit_status_cnt_n;
-        end
-     end
+     `FFC(commit_queue_q, commit_queue_n, '{default: 0}, clk_i, rst_ni, clr_i)
+     `FFC(commit_read_pointer_q, commit_read_pointer_n, '0, clk_i, rst_ni, clr_i)
+     `FFC(commit_write_pointer_q, commit_write_pointer_n, '0, clk_i, rst_ni, clr_i)
+     `FFC(commit_status_cnt_q, commit_status_cnt_n, '0, clk_i, rst_ni, clr_i)
 
 ///////////////////////////////////////////////////////
 // assertions
