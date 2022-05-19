@@ -13,13 +13,14 @@
 // Description: Issues instruction from the scoreboard and fetches the operands
 //              This also includes all the forwarding logic
 
+`include "common_cells/registers.svh"
 
 module issue_read_operands import ariane_pkg::*; #(
     parameter int unsigned NR_COMMIT_PORTS = 2
 )(
     input  logic                                   clk_i,    // Clock
     input  logic                                   rst_ni,   // Asynchronous reset active low
-    input  logic                                   rst_uarch_ni,
+    input  logic                                   clr_i,    // Synchronous clear active high
     // flush
     input  logic                                   flush_i,
     // coming from rename
@@ -237,65 +238,129 @@ module issue_read_operands import ariane_pkg::*; #(
 
     // FU select, assert the correct valid out signal (in the next cycle)
     // This needs to be like this to make verilator happy. I know its ugly.
-    always_ff @(posedge clk_i or negedge rst_uarch_ni) begin
-      if (!rst_uarch_ni) begin
-        alu_valid_q    <= 1'b0;
-        lsu_valid_q    <= 1'b0;
-        mult_valid_q   <= 1'b0;
-        fpu_valid_q    <= 1'b0;
-        fpu_fmt_q      <= 2'b0;
-        fpu_rm_q       <= 3'b0;
-        csr_valid_q    <= 1'b0;
-        branch_valid_q <= 1'b0;
+    logic alu_valid_in, lsu_valid_in, mult_valid_in;
+    logic [1:0] fpu_fmt_in;
+    logic [2:0] fpu_rm_in;
+    logic fpu_valid_in, csr_valid_in, branch_valid_in;
+
+    always_comb begin
+      if (flush_i) begin
+        alu_valid_in    = 1'b0;
+	lsu_valid_in    = 1'b0;
+        mult_valid_in   = 1'b0;
+        fpu_valid_in    = 1'b0;
+        csr_valid_in    = 1'b0;
+        branch_valid_in = 1'b0;
+        if (!issue_instr_i.ex.valid && issue_instr_valid_i && issue_ack_o && issue_instr_i.fu == FPU) begin
+          fpu_fmt_in = orig_instr.rftype.fmt; // fmt bits from instruction
+          fpu_rm_in = orig_instr.rftype.rm;  // rm bits from instruction
+        end else begin
+          fpu_fmt_in = 2'b0;
+          fpu_rm_in = 3'b0;
+        end
+      end else if (!issue_instr_i.ex.valid && issue_instr_valid_i && issue_ack_o) begin
+        case (issue_instr_i.fu)
+          ALU: begin
+            alu_valid_in    = 1'b1;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+	  end
+          CTRL_FLOW: begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b1;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+          end
+          MULT: begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b1;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+          end
+          FPU : begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b1;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = orig_instr.rftype.fmt; // fmt bits from instruction
+            fpu_rm_in       = orig_instr.rftype.rm;  // rm bits from instruction
+          end
+          FPU_VEC : begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b1;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = orig_instr.rvftype.vfmt;         // vfmt bits from instruction
+            fpu_rm_in       = {2'b0, orig_instr.rvftype.repl}; // repl bit from instruction
+          end
+          LOAD, STORE: begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b1;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+          end
+          CSR: begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b1;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+          end
+	  default: begin
+            alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+          end
+        endcase
       end else begin
-        alu_valid_q    <= 1'b0;
-        lsu_valid_q    <= 1'b0;
-        mult_valid_q   <= 1'b0;
-        fpu_valid_q    <= 1'b0;
-        fpu_fmt_q      <= 2'b0;
-        fpu_rm_q       <= 3'b0;
-        csr_valid_q    <= 1'b0;
-        branch_valid_q <= 1'b0;
-        // Exception pass through:
-        // If an exception has occurred simply pass it through
-        // we do not want to issue this instruction
-        if (!issue_instr_i.ex.valid && issue_instr_valid_i && issue_ack_o) begin
-            case (issue_instr_i.fu)
-                ALU:
-                    alu_valid_q    <= 1'b1;
-                CTRL_FLOW:
-                    branch_valid_q <= 1'b1;
-                MULT:
-                    mult_valid_q   <= 1'b1;
-                FPU : begin
-                    fpu_valid_q    <= 1'b1;
-                    fpu_fmt_q      <= orig_instr.rftype.fmt; // fmt bits from instruction
-                    fpu_rm_q       <= orig_instr.rftype.rm;  // rm bits from instruction
-                end
-                FPU_VEC : begin
-                    fpu_valid_q    <= 1'b1;
-                    fpu_fmt_q      <= orig_instr.rvftype.vfmt;         // vfmt bits from instruction
-                    fpu_rm_q       <= {2'b0, orig_instr.rvftype.repl}; // repl bit from instruction
-                end
-                LOAD, STORE:
-                    lsu_valid_q    <= 1'b1;
-                CSR:
-                    csr_valid_q    <= 1'b1;
-                default:;
-            endcase
-        end
-        // if we got a flush request, de-assert the valid flag, otherwise we will start this
-        // functional unit with the wrong inputs
-        if (flush_i) begin
-            alu_valid_q    <= 1'b0;
-            lsu_valid_q    <= 1'b0;
-            mult_valid_q   <= 1'b0;
-            fpu_valid_q    <= 1'b0;
-            csr_valid_q    <= 1'b0;
-            branch_valid_q <= 1'b0;
-        end
-      end
+	    alu_valid_in    = 1'b0;
+            lsu_valid_in    = 1'b0;
+            mult_valid_in   = 1'b0;
+            fpu_valid_in    = 1'b0;
+            csr_valid_in    = 1'b0;
+            branch_valid_in = 1'b0;
+            fpu_fmt_in      = 2'b0;
+            fpu_rm_in       = 3'b0;
+	end
     end
+
+    `FFC(alu_valid_q, alu_valid_in, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(lsu_valid_q, lsu_valid_in, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(mult_valid_q, mult_valid_in, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(fpu_valid_q, fpu_valid_in, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(csr_valid_q, csr_valid_in, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(branch_valid_q, branch_valid_in, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(fpu_fmt_q, fpu_fmt_in, 2'b0, clk_i, rst_ni, clr_i)
+    `FFC(fpu_rm_q, fpu_rm_in, 3'b0, clk_i, rst_ni, clr_i)
 
     // We can issue an instruction if we do not detect that any other instruction is writing the same
     // destination register.
@@ -418,29 +483,15 @@ module issue_read_operands import ariane_pkg::*; #(
     // ----------------------
     // Registers (ID <-> EX)
     // ----------------------
-    always_ff @(posedge clk_i or negedge rst_uarch_ni) begin
-        if (!rst_uarch_ni) begin
-            operand_a_q           <= '{default: 0};
-            operand_b_q           <= '{default: 0};
-            imm_q                 <= '0;
-            fu_q                  <= NONE;
-            operator_q            <= ADD;
-            trans_id_q            <= '0;
-            pc_o                  <= '0;
-            is_compressed_instr_o <= 1'b0;
-            branch_predict_o      <= {cf_t'(0), {riscv::VLEN{1'b0}}};
-        end else begin
-            operand_a_q           <= operand_a_n;
-            operand_b_q           <= operand_b_n;
-            imm_q                 <= imm_n;
-            fu_q                  <= fu_n;
-            operator_q            <= operator_n;
-            trans_id_q            <= trans_id_n;
-            pc_o                  <= issue_instr_i.pc;
-            is_compressed_instr_o <= issue_instr_i.is_compressed;
-            branch_predict_o      <= issue_instr_i.bp;
-        end
-    end
+    `FFC(operand_a_q, operand_a_n, ('{default: 0}), clk_i, rst_ni, clr_i)
+    `FFC(operand_b_q, operand_b_n, ('{default: 0}), clk_i, rst_ni, clr_i)
+    `FFC(imm_q, imm_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(fu_q, fu_n, NONE, clk_i, rst_ni, clr_i)
+    `FFC(operator_q, operator_n, ADD, clk_i, rst_ni, clr_i)
+    `FFC(trans_id_q, trans_id_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(pc_o, issue_instr_i.pc, '0, clk_i, rst_ni, clr_i)
+    `FFC(is_compressed_instr_o, issue_instr_i.is_compressed, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(branch_predict_o, issue_instr_i.bp, ({cf_t'(0), {riscv::VLEN{1'b0}}}), clk_i, rst_ni, clr_i)
 
     //pragma translate_off
     `ifndef VERILATOR
