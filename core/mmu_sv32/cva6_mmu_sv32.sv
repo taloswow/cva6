@@ -35,6 +35,7 @@ module cva6_mmu_sv32 import ariane_pkg::*; #(
 ) (
     input  logic                            clk_i,
     input  logic                            rst_ni,
+    input  logic                            clr_i,
     input  logic                            flush_i,
     input  logic                            enable_translation_i,
     input  logic                            en_ld_st_translation_i,   // enable virtual memory translation for load/stores
@@ -111,6 +112,7 @@ module cva6_mmu_sv32 import ariane_pkg::*; #(
     ) i_itlb (
         .clk_i            ( clk_i                      ),
         .rst_ni           ( rst_ni                     ),
+	.clr_i            ( clr_i                      ),
         .flush_i          ( flush_tlb_i                ),
 
         .update_i         ( update_ptw_itlb            ),
@@ -132,6 +134,7 @@ module cva6_mmu_sv32 import ariane_pkg::*; #(
     ) i_dtlb (
         .clk_i            ( clk_i                       ),
         .rst_ni           ( rst_ni                      ),
+	.clr_i            ( clr_i                       ),
         .flush_i          ( flush_tlb_i                 ),
 
         .update_i         ( update_ptw_dtlb             ),
@@ -154,6 +157,7 @@ module cva6_mmu_sv32 import ariane_pkg::*; #(
     ) i_ptw (
         .clk_i                  ( clk_i                 ),
         .rst_ni                 ( rst_ni                ),
+	.clr_i                  ( clr_i                 ),
         .ptw_active_o           ( ptw_active            ),
         .walking_instr_o        ( walking_instr         ),
         .ptw_error_o            ( ptw_error             ),
@@ -428,23 +432,11 @@ module cva6_mmu_sv32 import ariane_pkg::*; #(
     // ----------
     // Registers
     // ----------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            lsu_vaddr_q      <= '0;
-            lsu_req_q        <= '0;
-            misaligned_ex_q  <= '0;
-            dtlb_pte_q       <= '0;
-            dtlb_hit_q       <= '0;
-            lsu_is_store_q   <= '0;
-            dtlb_is_4M_q     <= '0;
-        end else begin
-            lsu_vaddr_q      <=  lsu_vaddr_n;
-            lsu_req_q        <=  lsu_req_n;
-            misaligned_ex_q  <=  misaligned_ex_n;
-            dtlb_pte_q       <=  dtlb_pte_n;
-            dtlb_hit_q       <=  dtlb_hit_n;
-            lsu_is_store_q   <=  lsu_is_store_n;
-            dtlb_is_4M_q     <=  dtlb_is_4M_n;
-        end
-    end
+    `FFC(lsu_vaddr_q, lsu_vaddr_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(lsu_req_q, lsu_req_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(misaligned_ex_q, misaligned_ex_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(dtlb_pte_q, dtlb_pte_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(dtlb_hit_q, dtlb_hit_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(lsu_is_store_q, lsu_is_store_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(dtlb_is_4M_q, dtlb_is_4M_n, '0, clk_i, rst_ni, clr_i)
 endmodule
