@@ -563,6 +563,7 @@ axi_adapter #(
 ) i_dm_axi_master (
     .clk_i                 ( clk                       ),
     .rst_ni                ( rst_n                     ),
+    .clr_i                 ( 1'b0                      ),
     .req_i                 ( dm_master_req             ),
     .type_i                ( ariane_axi::SINGLE_REQ    ),
     .amo_i                 ( ariane_pkg::AMO_NONE      ),

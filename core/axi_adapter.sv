@@ -14,7 +14,8 @@
  *
  * Description: Manages communication with the AXI Bus
  */
-//import std_cache_pkg::*;
+
+`include "common_cells/registers.svh"
 
 module axi_adapter #(
   parameter int unsigned DATA_WIDTH            = 256,
@@ -24,6 +25,7 @@ module axi_adapter #(
 )(
   input  logic                             clk_i,  // Clock
   input  logic                             rst_ni, // Asynchronous reset active low
+  input  logic                             clr_i, // Synchronous clear active high
 
   input  logic                             req_i,
   input  ariane_axi::ad_req_t              type_i,
@@ -392,26 +394,13 @@ module axi_adapter #(
   // ----------------
   // Registers
   // ----------------
-  always_ff @(posedge clk_i or negedge rst_ni) begin
-    if (~rst_ni) begin
-      // start in flushing state and initialize the memory
-      state_q       <= IDLE;
-      cnt_q         <= '0;
-      cache_line_q  <= '0;
-      addr_offset_q <= '0;
-      id_q          <= '0;
-      amo_q         <= ariane_pkg::AMO_NONE;
-      size_q        <= '0;
-    end else begin
-      state_q       <= state_d;
-      cnt_q         <= cnt_d;
-      cache_line_q  <= cache_line_d;
-      addr_offset_q <= addr_offset_d;
-      id_q          <= id_d;
-      amo_q         <= amo_d;
-      size_q        <= size_d;
-    end
-  end
+  `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+  `FFC(cnt_q, cnt_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(cache_line_q, cache_line_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(addr_offset_q, addr_offset_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(id_q, id_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(amo_q, amo_d, ariane_pkg::AMO_NONE, clk_i, rst_ni, clr_i)
+  `FFC(size_q, size_d, '0, clk_i, rst_ni, clr_i)
 
   function automatic axi_pkg::atop_t atop_from_amo(ariane_pkg::amo_t amo);
     axi_pkg::atop_t result = 6'b000000;
