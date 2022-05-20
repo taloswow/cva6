@@ -498,23 +498,12 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     // --------------------
     // Sequential Process
     // --------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            mshr_q        <= '0;
-            state_q       <= INIT;
-            cnt_q         <= '0;
-            evict_way_q   <= '0;
-            evict_cl_q    <= '0;
-            serve_amo_q   <= 1'b0;
-        end else begin
-            mshr_q        <= mshr_d;
-            state_q       <= state_d;
-            cnt_q         <= cnt_d;
-            evict_way_q   <= evict_way_d;
-            evict_cl_q    <= evict_cl_d;
-            serve_amo_q   <= serve_amo_d;
-        end
-    end
+    `FFC(mshr_q, mshr_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(state_q, state_d, INIT, clk_i, rst_ni, clr_i)
+    `FFC(cnt_q, cnt_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(evict_way_q, evict_way_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(evict_cl_q, evict_cl_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(serve_amo_q, serve_amo_d, 1'b0, clk_i, rst_ni, clr_i)
 
     //pragma translate_off
     `ifndef VERILATOR
@@ -586,6 +575,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
         .clk_i                (clk_i),
         .rst_ni               (rst_ni),
         .busy_o               (bypass_axi_busy),
+	.clr_i                (clr_i),
         .req_i                (bypass_adapter_req.req),
         .type_i               (bypass_adapter_req.reqtype),
         .amo_i                (bypass_adapter_req.amo),
@@ -622,6 +612,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
         .clk_i,
         .rst_ni,
         .busy_o              ( miss_axi_busy      ),
+	.clr_i,
         .req_i               ( req_fsm_miss_valid ),
         .type_i              ( req_fsm_miss_req   ),
         .amo_i               ( AMO_NONE           ),
@@ -738,17 +729,9 @@ module axi_adapter_arbiter #(
         endcase
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q <= IDLE;
-            sel_q   <= '0;
-            req_q   <= '0;
-        end else begin
-            state_q <= state_d;
-            sel_q   <= sel_d;
-            req_q   <= req_d;
-        end
-    end
+    `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+    `FFC(sel_q, sel_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(req_q, req_d, '0, clk_i, rst_ni, clr_i)
     // ------------
     // Assertions
     // ------------
