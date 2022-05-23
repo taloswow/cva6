@@ -38,8 +38,10 @@ module controller import ariane_pkg::*; (
     input  logic            cache_busy_i,           // Cache busy signal for fence.t
     output logic            cache_init_no,          // Do not init cache
     input  logic [31:0]     fence_t_pad_i,          // Pad cycles of fence.t end relative to time interrupt
+    input  logic            fence_t_src_sel_i,
     output logic [31:0]     fence_t_ceil_o,
     input  logic            time_irq_i,             // Time interrupt
+    input  riscv::priv_lvl_t priv_lvl_i,
     input  logic            eret_i,                 // Return from exception
     input  logic            ex_valid_i,             // We got an exception, flush the pipeline
     input  logic            set_debug_pc_i,         // set the debug pc from CSR
@@ -57,8 +59,9 @@ module controller import ariane_pkg::*; (
     logic flush_dcache;
 
     // Pad counter
-    logic [31:0] pad_cnt;
-    logic time_irq_q;
+    logic [31:0]      pad_cnt;
+    logic             time_irq_q;
+    riscv::priv_lvl_t priv_lvl_q;
 
     // cache init shift register. Keep 'no cache init' asserted for 3 cycles
     logic [2:0] cache_init_d, cache_init_q;
@@ -262,20 +265,25 @@ module controller import ariane_pkg::*; (
         endcase
     end
 
+    logic load_pad_cnt;
+
+    assign load_pad_cnt = fence_t_src_sel_i ? ((priv_lvl_q == riscv::PRIV_LVL_U) && (priv_lvl_i != riscv::PRIV_LVL_U))
+                                            : (time_irq_i & ~time_irq_q);
+
     counter #(
         .WIDTH           ( 32 ),
         .STICKY_OVERFLOW ( 0  )
     ) i_pad_cnt (
         .clk_i,
         .rst_ni,
-        .clear_i    ( 1'b0                     ),
-        .reg_clear  ( clr_i                    ),
-        .en_i       ( |pad_cnt                 ),  // Count until 0
-        .load_i     ( time_irq_i & ~time_irq_q ),  // Start counting on positive edge of time irq
-        .down_i     ( 1'b1                     ),  // Always count down
-        .d_i        ( fence_t_pad_i            ),  // Start counting from FENCE_T_CSR value
-        .q_o        ( pad_cnt                  ),
-        .overflow_o (                          )
+        .clear_i    ( 1'b0          ),
+        .reg_clear  ( clr_i         ),
+        .en_i       ( |pad_cnt      ),  // Count until 0
+        .load_i     ( load_pad_cnt  ),  // Start counting on positive edge of time irq
+        .down_i     ( 1'b1          ),  // Always count down
+        .d_i        ( fence_t_pad_i ),  // Start counting from FENCE_T_CSR value
+        .q_o        ( pad_cnt       ),
+        .overflow_o (               )
     );
 
     // ----------------------
@@ -289,4 +297,5 @@ module controller import ariane_pkg::*; (
     `FFC(rst_addr_q, rst_addr_d, boot_addr_i, clk_i, rst_ni, clr_i)
     `FFC(time_irq_q, time_irq_i, 1'b0, clk_i, rst_ni, clr_i)
     `FFC(cache_init_q, cache_init_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(priv_lvl_q, priv_lvl_i, riscv::PRIV_LVL_M, clk_i, rst_ni, clr_i)
 endmodule
