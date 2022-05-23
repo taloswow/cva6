@@ -194,6 +194,7 @@ module ex_stage import ariane_pkg::*; #(
     csr_buffer csr_buffer_i (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .flush_i,
         .fu_data_i,
         .csr_valid_i,
