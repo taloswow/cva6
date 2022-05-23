@@ -112,6 +112,7 @@ module issue_stage import ariane_pkg::*; #(
     re_name i_re_name (
         .clk_i                  ( clk_i                        ),
         .rst_ni                 ( rst_ni                       ),
+	.clr_i                  ( clr_i                        ),
         .flush_i                ( flush_i                      ),
         .flush_unissied_instr_i ( flush_unissued_instr_i       ),
         .issue_instr_i          ( decoded_instr_i              ),
