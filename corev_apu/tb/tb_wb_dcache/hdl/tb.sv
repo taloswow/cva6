@@ -414,6 +414,7 @@ module tb import ariane_pkg::*; import std_cache_pkg::*; import tb_pkg::*; #()()
   ) i_dut (
     .clk_i           ( clk_i           ),
     .rst_ni          ( rst_ni          ),
+    .clr_i           ( 1'b0            ),
     .flush_i         ( flush_i         ),
     .flush_ack_o     ( flush_ack_o     ),
     .enable_i        ( enable_i        ),
