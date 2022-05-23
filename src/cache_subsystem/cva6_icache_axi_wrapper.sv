@@ -13,6 +13,8 @@
 // Description: wrapper module to connect the L1I$ to a 64bit AXI bus.
 //
 
+`include  "common_cells/registers.svh"
+
 module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter ariane_cfg_t ArianeCfg = ArianeDefaultConfig,  // contains cacheable regions
   parameter int unsigned AxiAddrWidth = 0,
@@ -199,18 +201,9 @@ module cva6_icache_axi_wrapper import ariane_pkg::*; import wt_cache_pkg::*; #(
   end
 
   // Registers
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_rd_buf
-    if (!rst_ni) begin
-      req_valid_q <= 1'b0;
-      req_data_q  <= '0;
-      first_q     <= 1'b1;
-      rd_shift_q  <= '0;
-    end else begin
-      req_valid_q <= req_valid_d;
-      req_data_q  <= req_data_d;
-      first_q     <= first_d;
-      rd_shift_q  <= rd_shift_d;
-    end
-  end
+  `FFC(req_valid_q, req_valid_d, 1'b0, clk_i, rst_ni, clr_i)
+  `FFC(req_data_q, req_data_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(first_q, first_d, 1'b1, clk_i, rst_ni, clr_i)
+  `FFC(rd_shift_q, rd_shift_d, '0, clk_i, rst_ni, clr_i)
 
 endmodule // cva6_icache_axi_wrapper

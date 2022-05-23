@@ -48,6 +48,7 @@
 //    then, only the NC word is written into the write buffer and no further write requests are acknowledged until that
 //    word has been evicted from the write buffer.
 
+`include "common_cells/registers.svh"
 
 module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter ariane_pkg::ariane_cfg_t    ArianeCfg          = ariane_pkg::ArianeDefaultConfig     // contains cacheable regions
@@ -490,33 +491,17 @@ module wt_dcache_wbuffer import ariane_pkg::*; import wt_cache_pkg::*; #(
 // ff's
 ///////////////////////////////////////////////////////
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
-    if (!rst_ni) begin
-      wbuffer_q     <= '{default: '0};
-      tx_stat_q     <= '{default: '0};
-      ni_pending_q  <= '0;
-      check_ptr_q   <= '0;
-      check_ptr_q1  <= '0;
-      check_en_q    <= '0;
-      check_en_q1   <= '0;
-      rd_tag_q      <= '0;
-      rd_hit_oh_q   <= '0;
-      wr_cl_vld_q   <= '0;
-      wr_cl_idx_q   <= '0;
-    end else begin
-      wbuffer_q     <= wbuffer_d;
-      tx_stat_q     <= tx_stat_d;
-      ni_pending_q  <= ni_pending_d;
-      check_ptr_q   <= check_ptr_d;
-      check_ptr_q1  <= check_ptr_q;
-      check_en_q    <= check_en_d;
-      check_en_q1   <= check_en_q;
-      rd_tag_q      <= rd_tag_d;
-      rd_hit_oh_q   <= rd_hit_oh_d;
-      wr_cl_vld_q   <= wr_cl_vld_d;
-      wr_cl_idx_q   <= wr_cl_idx_d;
-    end
-  end
+  `FFC(wbuffer_q, wbuffer_d, '{default: '0}, clk_i, rst_ni, clr_i)
+  `FFC(tx_stat_q, tx_stat_d, '{default: '0}, clk_i, rst_ni, clr_i)
+  `FFC(ni_pending_q, ni_pending_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(check_ptr_q, check_ptr_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(check_ptr_q1, check_ptr_q, '0, clk_i, rst_ni, clr_i)
+  `FFC(check_en_q, check_en_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(check_en_q1, check_en_q, '0, clk_i, rst_ni, clr_i)
+  `FFC(rd_tag_q, rd_tag_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(rd_hit_oh_q, rd_hit_oh_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(wr_cl_vld_q, wr_cl_vld_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(wr_cl_idx_q, wr_cl_idx_d, '0, clk_i, rst_ni, clr_i)
 
 
 ///////////////////////////////////////////////////////

@@ -11,11 +11,14 @@
 // Author: Florian Zaruba, ETH Zurich
 // Description: Bypass version of data cache
 
+`include "common_cells/registers.svh"
+
 module std_nbdcache #(
     parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig // contains cacheable regions
 ) (
     input  logic                            clk_i,       // Clock
     input  logic                            rst_ni,      // Asynchronous reset active low
+    input  logic                            clr_i,       // Synchronous clear active high
     // Cache management
     input  logic                            enable_i,    // from CSR
     input  logic                            flush_i,     // high until acknowledged
@@ -314,15 +317,7 @@ module std_nbdcache #(
         .amo_result_o    ( amo_result_o  )
     );
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q <= Idle;
-            req_q <= '0;
-            amo_load_q <= '0;
-        end else begin
-            state_q <= state_d;
-            req_q <= req_d;
-            amo_load_q <= amo_load_d;
-        end
-    end
+    `FFC(state_q, state_d, Idle, clk_i, rst_ni, clr_i)
+    `FFC(req_q, req_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(amo_load_q, amo_load_d, '0, clk_i, rst_ni, clr_i)
 endmodule

@@ -16,6 +16,8 @@
 // MISS Handler
 // --------------
 
+`include "common_cells/registers.svh"
+
 module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     parameter int unsigned NR_PORTS       = 3,
     parameter int unsigned AXI_ADDR_WIDTH = 0,
@@ -551,6 +553,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_bypass_arbiter (
         .clk_i (clk_i),
         .rst_ni(rst_ni),
+	.clr_i (clr_i),
         // Master Side
         .req_i (bypass_ports_req),
         .rsp_o (bypass_ports_rsp),
@@ -677,6 +680,7 @@ module axi_adapter_arbiter #(
 )(
     input  logic                clk_i,  // Clock
     input  logic                rst_ni, // Asynchronous reset active low
+    input  logic                clr_i,  // Synchronous clear active high
     // Master ports
     input  req_t [NR_PORTS-1:0] req_i,
     output rsp_t [NR_PORTS-1:0] rsp_o,
