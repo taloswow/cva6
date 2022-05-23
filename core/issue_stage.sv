@@ -19,9 +19,10 @@ module issue_stage import ariane_pkg::*; #(
     parameter int unsigned NR_WB_PORTS = 4,
     parameter int unsigned NR_COMMIT_PORTS = 2
 )(
-    input  logic                                     clk_i,     // Clock
-    input  logic                                     rst_ni,    // Asynchronous reset active low
-    input  logic                                     clr_i,     // Synchronous clear active high
+    input  logic                                     clk_i,       // Clock
+    input  logic                                     rst_ni,      // Asynchronous reset active low
+    input  logic                                     clr_all_i,   // Synchronous clear active high
+    input  logic                                     clr_uarch_i, // Clear non-necessary stuff for fence.t
 
     output logic                                     sb_full_o,
     input  logic                                     flush_unissued_instr_i,
@@ -112,7 +113,7 @@ module issue_stage import ariane_pkg::*; #(
     re_name i_re_name (
         .clk_i                  ( clk_i                        ),
         .rst_ni                 ( rst_ni                       ),
-	.clr_i                  ( clr_i                        ),
+	.clr_i                  ( clr_uarch_i                  ),
         .flush_i                ( flush_i                      ),
         .flush_unissied_instr_i ( flush_unissued_instr_i       ),
         .issue_instr_i          ( decoded_instr_i              ),
@@ -157,7 +158,7 @@ module issue_stage import ariane_pkg::*; #(
         .wbdata_i              ( wbdata_i                                  ),
         .ex_i                  ( ex_ex_i                                   ),
 
-	.clr_i                 ( clr_i                                     ),
+	.clr_i                 ( clr_uarch_i                               ),
         .*
     );
 
@@ -191,6 +192,8 @@ module issue_stage import ariane_pkg::*; #(
         .cvxif_ready_i       ( x_issue_ready_i                 ),
         .cvxif_off_instr_o   ( x_off_instr_o                   ),
         .mult_valid_o        ( mult_valid_o                    ),
+	.clr_uarch_i         ( clr_uarch_i                     ),
+	.clr_all_i           ( clr_all_i                       ),
         .*
     );
 

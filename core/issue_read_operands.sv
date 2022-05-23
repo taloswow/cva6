@@ -18,9 +18,10 @@
 module issue_read_operands import ariane_pkg::*; #(
     parameter int unsigned NR_COMMIT_PORTS = 2
 )(
-    input  logic                                   clk_i,    // Clock
-    input  logic                                   rst_ni,   // Asynchronous reset active low
-    input  logic                                   clr_i,    // Synchronous clear active high
+    input  logic                                   clk_i,       // Clock
+    input  logic                                   rst_ni,      // Asynchronous reset active low
+    input  logic                                   clr_all_i,     // Synchronous clear active high
+    input  logic                                   clr_uarch_i, // Clear non-necessary stuff for fence.t
     // flush
     input  logic                                   flush_i,
     // coming from rename
@@ -369,14 +370,14 @@ module issue_read_operands import ariane_pkg::*; #(
 	end
     end
 
-    `FFC(alu_valid_q, alu_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(lsu_valid_q, lsu_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(mult_valid_q, mult_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(fpu_valid_q, fpu_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(csr_valid_q, csr_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(branch_valid_q, branch_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(fpu_fmt_q, fpu_fmt_in, 2'b0, clk_i, rst_ni, clr_i)
-    `FFC(fpu_rm_q, fpu_rm_in, 3'b0, clk_i, rst_ni, clr_i)
+    `FFC(alu_valid_q, alu_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(lsu_valid_q, lsu_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(mult_valid_q, mult_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(fpu_valid_q, fpu_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(csr_valid_q, csr_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(branch_valid_q, branch_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(fpu_fmt_q, fpu_fmt_in, 2'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(fpu_rm_q, fpu_rm_in, 3'b0, clk_i, rst_ni, clr_uarch_i)
 
     if (CVXIF_PRESENT) begin
       logic cvxif_valid_in;
@@ -395,8 +396,8 @@ module issue_read_operands import ariane_pkg::*; #(
         end
       end
 
-      `FFC(cvxif_valid_q, cvxif_valid_in, 1'b0, clk_i, rst_ni, clr_i)
-      `FFC(cvxif_off_instr_q, cvxif_off_instr_in, 32'b0, clk_i, rst_ni, clr_i)
+      `FFC(cvxif_valid_q, cvxif_valid_in, 1'b0, clk_i, rst_ni, clr_uarch_i)
+      `FFC(cvxif_off_instr_q, cvxif_off_instr_in, 32'b0, clk_i, rst_ni, clr_uarch_i)
     end
 
     // We can issue an instruction if we do not detect that any other instruction is writing the same
@@ -522,15 +523,15 @@ module issue_read_operands import ariane_pkg::*; #(
     // ----------------------
     // Registers (ID <-> EX)
     // ----------------------
-    `FFC(operand_a_q, operand_a_n, ('{default: 0}), clk_i, rst_ni, clr_i)
-    `FFC(operand_b_q, operand_b_n, ('{default: 0}), clk_i, rst_ni, clr_i)
-    `FFC(imm_q, imm_n, '0, clk_i, rst_ni, clr_i)
-    `FFC(fu_q, fu_n, NONE, clk_i, rst_ni, clr_i)
-    `FFC(operator_q, operator_n, ADD, clk_i, rst_ni, clr_i)
-    `FFC(trans_id_q, trans_id_n, '0, clk_i, rst_ni, clr_i)
-    `FFC(pc_o, issue_instr_i.pc, '0, clk_i, rst_ni, clr_i)
-    `FFC(is_compressed_instr_o, issue_instr_i.is_compressed, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(branch_predict_o, issue_instr_i.bp, ({cf_t'(0), {riscv::VLEN{1'b0}}}), clk_i, rst_ni, clr_i)
+    `FFC(operand_a_q, operand_a_n, ('{default: 0}), clk_i, rst_ni, clr_uarch_i)
+    `FFC(operand_b_q, operand_b_n, ('{default: 0}), clk_i, rst_ni, clr_uarch_i)
+    `FFC(imm_q, imm_n, '0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(fu_q, fu_n, NONE, clk_i, rst_ni, clr_uarch_i)
+    `FFC(operator_q, operator_n, ADD, clk_i, rst_ni, clr_uarch_i)
+    `FFC(trans_id_q, trans_id_n, '0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(pc_o, issue_instr_i.pc, '0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(is_compressed_instr_o, issue_instr_i.is_compressed, 1'b0, clk_i, rst_ni, clr_uarch_i)
+    `FFC(branch_predict_o, issue_instr_i.bp, ({cf_t'(0), {riscv::VLEN{1'b0}}}), clk_i, rst_ni, clr_uarch_i)
 
     //pragma translate_off
     `ifndef VERILATOR

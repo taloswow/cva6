@@ -70,9 +70,15 @@ module cva6 import ariane_pkg::*; #(
   logic [riscv::VLEN-1:0]     pc_commit;
   logic                       eret;
   logic [NR_COMMIT_PORTS-1:0] commit_ack;
-  logic                       clr_i;
 
-  assign clr_i = 1'b0;
+  // -----------------------------------
+  // synchronous clear signals
+  // -------------------------------------
+  logic                       clr_uarch; // signal used for fence.t-rst
+  logic                       clr_all;   // external signal to synchronously clear everything
+  logic                       clr_o;     // controller output for fence.t
+
+  assign clr_uarch = (clr_all || clr_o);
 
   // --------------
   // PCGEN <-> CSR
@@ -238,6 +244,7 @@ module cva6 import ariane_pkg::*; #(
   logic                     dcache_flush_ack_cache_ctrl;
   logic                     set_debug_pc;
   logic                     flush_commit;
+  logic [riscv::VLEN-1:0]   rst_addr_ctrl_if;
 
   icache_areq_i_t           icache_areq_ex_cache;
   icache_areq_o_t           icache_areq_cache_ex;
@@ -265,7 +272,7 @@ module cva6 import ariane_pkg::*; #(
     .flush_i             ( flush_ctrl_if                 ), // not entirely correct
     .flush_bp_i          ( 1'b0                          ),
     .debug_mode_i        ( debug_mode                    ),
-    .boot_addr_i         ( boot_addr_i[riscv::VLEN-1:0]  ),
+    .boot_addr_i         ( rst_addr_ctrl_if              ),
     .icache_dreq_i       ( icache_dreq_cache_if          ),
     .icache_dreq_o       ( icache_dreq_if_cache          ),
     .resolved_branch_i   ( resolved_branch               ),
@@ -279,7 +286,7 @@ module cva6 import ariane_pkg::*; #(
     .fetch_entry_o       ( fetch_entry_if_id             ),
     .fetch_entry_valid_o ( fetch_valid_if_id             ),
     .fetch_entry_ready_i ( fetch_ready_id_if             ),
-    .clr_i               ( clr_i                         ),
+    .clr_i               ( clr_uarch                     ),
     .*
   );
 
@@ -289,7 +296,7 @@ module cva6 import ariane_pkg::*; #(
   id_stage id_stage_i (
     .clk_i,
     .rst_ni,
-    .clr_i,
+    .clr_i                      ( clr_uarch                  ),
     .flush_i                    ( flush_ctrl_if              ),
     .debug_req_i,
 
@@ -323,7 +330,8 @@ module cva6 import ariane_pkg::*; #(
   ) issue_stage_i (
     .clk_i,
     .rst_ni,
-    .clr_i,
+    .clr_all_i                  ( clr_all                      ),
+    .clr_uarch_i                ( clr_uarch                    ),
     .sb_full_o                  ( sb_full                      ),
     .flush_unissued_instr_i     ( flush_unissued_instr_ctrl_id ),
     .flush_i                    ( flush_ctrl_id                ),
@@ -388,7 +396,7 @@ module cva6 import ariane_pkg::*; #(
   ) ex_stage_i (
     .clk_i                  ( clk_i                       ),
     .rst_ni                 ( rst_ni                      ),
-    .clr_i                  ( clr_i                       ),
+    .clr_i                  ( clr_uarch                   ),
     .debug_mode_i           ( debug_mode                  ),
     .flush_i                ( flush_ctrl_ex               ),
     .rs1_forwarding_i       ( rs1_forwarding_id_ex        ),
@@ -586,7 +594,7 @@ module cva6 import ariane_pkg::*; #(
     .ipi_i,
     .irq_i,
     .time_irq_i,
-    .clr_i,
+    .clr_i                  ( clr_all                       ),
     .*
   );
   // ------------------------
@@ -595,7 +603,7 @@ module cva6 import ariane_pkg::*; #(
   perf_counters i_perf_counters (
     .clk_i             ( clk_i                  ),
     .rst_ni            ( rst_ni                 ),
-    .clr_i             ( clr_i                  ),
+    .clr_i             ( clr_all                ),
     .debug_mode_i      ( debug_mode             ),
     .addr_i            ( addr_csr_perf          ),
     .we_i              ( we_csr_perf            ),
@@ -629,10 +637,14 @@ module cva6 import ariane_pkg::*; #(
     .flush_tlb_o            ( flush_tlb_ctrl_ex             ),
     .flush_dcache_o         ( dcache_flush_ctrl_cache       ),
     .flush_dcache_ack_i     ( dcache_flush_ack_cache_ctrl   ),
+    .fence_t_clr_o          ( clr_o                         ),
+    .rst_addr_o             ( rst_addr_ctrl_if              ), 
 
     .halt_csr_i             ( halt_csr_ctrl                 ),
     .halt_o                 ( halt_ctrl                     ),
     // control ports
+    .boot_addr_i            ( boot_addr_i[riscv::VLEN-1:0]  ),
+    .pc_commit_i            ( pc_commit                     ),
     .eret_i                 ( eret                          ),
     .ex_valid_i             ( ex_commit.valid               ),
     .set_debug_pc_i         ( set_debug_pc                  ),
@@ -645,6 +657,7 @@ module cva6 import ariane_pkg::*; #(
     .flush_commit_i         ( flush_commit                  ),
 
     .flush_icache_o         ( icache_flush_ctrl_cache       ),
+    .clr_i                  ( clr_all                          ),
     .*
   );
 
@@ -660,7 +673,7 @@ module cva6 import ariane_pkg::*; #(
     // to D$
     .clk_i                 ( clk_i                       ),
     .rst_ni                ( rst_ni                      ),
-    .clr_i                 ( clr_i                       ),
+    .clr_i                 ( clr_uarch                   ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
     .icache_flush_i        ( icache_flush_ctrl_cache     ),
@@ -703,7 +716,7 @@ module cva6 import ariane_pkg::*; #(
     // to D$
     .clk_i                 ( clk_i                       ),
     .rst_ni                ( rst_ni                      ),
-    .clr_i                 ( clr_i                       ),
+    .clr_i                 ( clr_uarch                   ),
     .priv_lvl_i            ( priv_lvl                    ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
@@ -778,7 +791,7 @@ module cva6 import ariane_pkg::*; #(
     i_pc_fifo (
       .clk_i      ( clk_i                                               ),
       .rst_ni     ( rst_ni                                              ),
-      .clr_i      ( clr_i                                               ),
+      .clr_i      ( 1'b0                                                ),
       .flush_i    ( '0                                                  ),
       .testmode_i ( '0                                                  ),
       .full_o     (                                                     ),
@@ -797,7 +810,7 @@ module cva6 import ariane_pkg::*; #(
   i_rr_arb_tree (
     .clk_i   ( clk_i        ),
     .rst_ni  ( rst_ni       ),
-    .clr_i   ( clr_i        ),
+    .clr_i   ( 1'b0         ),
     .flush_i ( '0           ),
     .rr_i    ( '0           ),
     .req_i   ( ~pc_empty    ),
