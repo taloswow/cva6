@@ -15,12 +15,15 @@
 
 /* verilator lint_off WIDTH */
 
+`include "common_cells/registers.svh"
+
 module ptw import ariane_pkg::*; #(
         parameter int ASID_WIDTH = 1,
         parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig
 ) (
     input  logic                    clk_i,                  // Clock
     input  logic                    rst_ni,                 // Asynchronous reset active low
+    input  logic                    clr_i,                  // Synchronous clear active high
     input  logic                    flush_i,                // flush everything, we need to do this because
                                                             // actually everything we do is speculative at this stage
                                                             // e.g.: there could be a CSR instruction that changes everything
@@ -375,31 +378,16 @@ module ptw import ariane_pkg::*; #(
     end
 
     // sequential process
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q            <= IDLE;
-            is_instr_ptw_q     <= 1'b0;
-            ptw_lvl_q          <= LVL1;
-            tag_valid_q        <= 1'b0;
-            tlb_update_asid_q  <= '0;
-            vaddr_q            <= '0;
-            ptw_pptr_q         <= '0;
-            global_mapping_q   <= 1'b0;
-            data_rdata_q       <= '0;
-            data_rvalid_q      <= 1'b0;
-        end else begin
-            state_q            <= state_d;
-            ptw_pptr_q         <= ptw_pptr_n;
-            is_instr_ptw_q     <= is_instr_ptw_n;
-            ptw_lvl_q          <= ptw_lvl_n;
-            tag_valid_q        <= tag_valid_n;
-            tlb_update_asid_q  <= tlb_update_asid_n;
-            vaddr_q            <= vaddr_n;
-            global_mapping_q   <= global_mapping_n;
-            data_rdata_q       <= req_port_i.data_rdata;
-            data_rvalid_q      <= req_port_i.data_rvalid;
-        end
-    end
+    `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+    `FFC(is_instr_ptw_q, is_instr_ptw_n, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(ptw_lvl_q, ptw_lvl_n, LVL1, clk_i, rst_ni, clr_i)
+    `FFC(tag_valid_q, tag_valid_n, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(tlb_update_asid_q, tlb_update_asid_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(vaddr_q, vaddr_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(ptw_pptr_q, ptw_pptr_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(global_mapping_q, global_mapping_n, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(data_rdata_q, req_port_i.data_rdata, '0, clk_i, rst_ni, clr_i)
+    `FFC(data_rvalid_q, req_port_i.data_rvalid, 1'b0, clk_i, rst_ni, clr_i)
 
 endmodule
 /* verilator lint_on WIDTH */

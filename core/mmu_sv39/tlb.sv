@@ -14,6 +14,7 @@
 // Description: Translation Lookaside Buffer, SV39
 //              fully set-associative
 
+`include "common_cells/registers.svh"
 
 module tlb import ariane_pkg::*; #(
       parameter int unsigned TLB_ENTRIES = 4,
@@ -21,6 +22,7 @@ module tlb import ariane_pkg::*; #(
   )(
     input  logic                    clk_i,    // Clock
     input  logic                    rst_ni,   // Asynchronous reset active low
+    input  logic                    clr_i,    // Synchronous clear active high
     input  logic                    flush_i,  // Flush signal
     // Update TLB
     input  tlb_update_t             update_i,
@@ -228,17 +230,9 @@ module tlb import ariane_pkg::*; #(
     end
 
     // sequential process
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if(~rst_ni) begin
-            tags_q      <= '{default: 0};
-            content_q   <= '{default: 0};
-            plru_tree_q <= '{default: 0};
-        end else begin
-            tags_q      <= tags_n;
-            content_q   <= content_n;
-            plru_tree_q <= plru_tree_n;
-        end
-    end
+    `FFC(tags_q, tags_n, '{default: 0}, clk_i, rst_ni, clr_i)
+    `FFC(content_q, content_n, '{default: 0}, clk_i, rst_ni, clr_i)
+    `FFC(plru_tree_q, plru_tree_n, '{default: 0}, clk_i, rst_ni, clr_i)
     //--------------
     // Sanity checks
     //--------------
