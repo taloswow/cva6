@@ -22,6 +22,7 @@ module wt_dcache_ctrl import ariane_pkg::*; import wt_cache_pkg::*; #(
   input  logic                            rst_ni,         // Asynchronous reset active low
   input  logic                            clr_i,          // Synchronous clear active high
   input  logic                            cache_en_i,
+  output logic                            busy_o,
   // core request ports
   input  dcache_req_i_t                   req_port_i,
   output dcache_req_o_t                   req_port_o,
@@ -93,6 +94,8 @@ module wt_dcache_ctrl import ariane_pkg::*; import wt_cache_pkg::*; #(
   assign rd_req_d     = rd_req_o;
   assign rd_ack_d     = rd_ack_i;
   assign rd_tag_only_o = '0;
+
+  assign busy_o = (state_q != IDLE);
 
 ///////////////////////////////////////////////////////
 // main control logic
