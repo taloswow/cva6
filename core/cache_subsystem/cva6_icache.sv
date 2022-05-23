@@ -38,6 +38,7 @@ module cva6_icache import ariane_pkg::*; import wt_cache_pkg::*; #(
   input  logic                      en_i,                 // enable icache
   output logic                      miss_o,               // to performance counter
   output logic                      busy_o,               // for fence.t to track caches
+  input  logic                      init_ni,              // do not init after enabling
   // address translation requests
   input  icache_areq_i_t            areq_i,
   output icache_areq_o_t            areq_o,
@@ -157,7 +158,7 @@ end else begin : gen_piton_offset
   always_comb begin : p_fsm
     // default assignment
     state_d      = state_q;
-    cache_en_d   = cache_en_q & en_i;// disabling the cache is always possible, enable needs to go via flush
+    cache_en_d   = (cache_en_q | init_ni) & en_i;// disabling the cache is always possible, enable needs to go via flush
     flush_en     = 1'b0;
     cmp_en_d     = 1'b0;
     cache_rden   = 1'b0;
@@ -201,7 +202,7 @@ end else begin : gen_piton_offset
           cmp_en_d = cache_en_q;
 
           // handle pending flushes, or perform cache clear upon enable
-          if (flush_d || (en_i && !cache_en_q)) begin
+          if (flush_d || (en_i && !cache_en_q && !init_ni)) begin
             state_d    = FLUSH;
           // wait for incoming requests
           end else begin

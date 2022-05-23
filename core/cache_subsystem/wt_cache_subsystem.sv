@@ -26,6 +26,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   input  logic                           rst_ni,
   input  logic                           clr_i,
   output logic                           busy_o,
+  input  logic                           init_ni,
   // I$
   input  logic                           icache_en_i,            // enable icache (or bypass e.g: in debug mode)
   input  logic                           icache_flush_i,         // flush the icache, flush and kill have to be asserted together
@@ -87,6 +88,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
     .en_i               ( icache_en_i             ),
     .miss_o             ( icache_miss_o           ),
     .busy_o             ( icache_busy             ),
+    .init_ni            ( init_ni                 ),
     .areq_i             ( icache_areq_i           ),
     .areq_o             ( icache_areq_o           ),
     .dreq_i             ( icache_dreq_i           ),
@@ -117,6 +119,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
     .flush_ack_o     ( dcache_flush_ack_o      ),
     .miss_o          ( dcache_miss_o           ),
     .busy_o          ( dcache_busy             ),
+    .init_ni         ( init_ni                 ),
     .wbuffer_empty_o ( wbuffer_empty_o         ),
     .wbuffer_not_ni_o ( wbuffer_not_ni_o       ),
     .amo_req_i       ( dcache_amo_req_i        ),

@@ -36,6 +36,7 @@ module controller import ariane_pkg::*; (
     input  logic            halt_csr_i,             // Halt request from CSR (WFI instruction)
     output logic            halt_o,                 // Halt signal to commit stage
     input  logic            cache_busy_i,           // Cache busy signal for fence.t
+    output logic            cache_init_no,          // Do not init cache
     input  logic [31:0]     fence_t_pad_i,          // Pad cycles of fence.t end relative to time interrupt
     input  logic            time_irq_i,             // Time interrupt
     input  logic            eret_i,                 // Return from exception
@@ -57,6 +58,11 @@ module controller import ariane_pkg::*; (
     // Pad counter
     logic [31:0] pad_cnt;
     logic time_irq_q;
+
+    // cache init shift register. Keep 'no cache init' asserted for 3 cycles
+    logic [2:0] cache_init_d, cache_init_q;
+    assign cache_init_d[2:1] = cache_init_q[1:0];
+    assign cache_init_no = |cache_init_q;
 
     // address to fetch from after coming out of (uarch) reset
     logic [riscv::VLEN-1:0] rst_addr_d, rst_addr_q;
@@ -210,6 +216,7 @@ module controller import ariane_pkg::*; (
         fence_t_state_d = fence_t_state_q;
         fence_t_clr_cnt_d = fence_t_clr_cnt_q;
         fence_t_clr_o    = 1'b0;
+	cache_init_d[0] = 1'b0;
 
         unique case (fence_t_state_q)
             // Idle
@@ -233,7 +240,8 @@ module controller import ariane_pkg::*; (
 
             // Reset microarchitecture
             RST_UARCH: begin
-                fence_t_clr_o = 1'b1;
+                fence_t_clr_o   = 1'b1;
+		cache_init_d[0] = 1'b1;
 
                 // Return to IDLE after 16 cycles
                 if (fence_t_clr_cnt_q == 4'hf) begin
@@ -277,4 +285,5 @@ module controller import ariane_pkg::*; (
     `FFC(flush_dcache_o, flush_dcache, 1'b0, clk_i, rst_ni, clr_i)
     `FFC(rst_addr_q, rst_addr_d, boot_addr_i, clk_i, rst_ni, clr_i)
     `FFC(time_irq_q, time_irq_i, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(cache_init_q, cache_init_d, '0, clk_i, rst_ni, clr_i)
 endmodule

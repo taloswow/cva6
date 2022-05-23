@@ -31,6 +31,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
   // local cache management signals
   input  logic                                       wbuffer_empty_i,
   output logic                                       cache_en_o,  // local cache enable signal
+  input  logic                                       init_ni,     // no init after reset
   // AMO interface
   input  amo_req_t                                   amo_req_i,
   output amo_resp_t                                  amo_resp_o,
@@ -71,7 +72,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
 );
 
   // controller FSM
-  typedef enum logic[2:0] {IDLE, DRAIN, AMO,  FLUSH, STORE_WAIT, LOAD_WAIT, AMO_WAIT} state_e;
+  typedef enum logic[2:0] {IDLE, DRAIN, AMO, FLUSH, INIT, STORE_WAIT, LOAD_WAIT, AMO_WAIT} state_e;
   state_e state_d, state_q;
 
   // MSHR for reads
@@ -363,7 +364,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
     miss_replay_o    = '0;
 
     // disabling cache is possible anytime, enabling goes via flush
-    enable_d         = enable_q & enable_i;
+    enable_d         = (enable_q | init_ni) & enable_i;
     flush_ack_d      = flush_ack_q;
     flush_en         = 1'b0;
     amo_sel          = 1'b0;
@@ -472,6 +473,12 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
         end
       end
       //////////////////////////////////
+      // initialize the cache
+      INIT: begin
+        // flush, unless we want to skip init
+        state_d = (init_ni) ? IDLE : FLUSH;
+      end
+      //////////////////////////////////
       // send out amo op request
       AMO: begin
         mem_data_o.rtype = DCACHE_ATOMIC_REQ;
@@ -504,7 +511,7 @@ module wt_dcache_missunit import ariane_pkg::*; import wt_cache_pkg::*; #(
 ///////////////////////////////////////////////////////
 // ff's
 ///////////////////////////////////////////////////////
-`FFC(state_q, state_d, FLUSH, clk_i, rst_ni, clr_i)
+`FFC(state_q, state_d, INIT, clk_i, rst_ni, clr_i)
 `FFC(cnt_q, cnt_d, '0, clk_i, rst_ni, clr_i)
 `FFC(enable_q, enable_d, '0, clk_i, rst_ni, clr_i)
 `FFC(flush_ack_q, flush_ack_d, '0, clk_i, rst_ni, clr_i)
