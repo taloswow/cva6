@@ -25,6 +25,7 @@
 //        4) Read ports with same priority are RR arbited. but high prio ports (rd_prio_i[port_nr] = '1b1) will stall
 //           low prio ports (rd_prio_i[port_nr] = '1b0)
 
+`include "common_cells/registers.svh"
 
 module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter bit          Axi64BitCompliant  = 1'b0, // set this to 1 when using in conjunction with 64bit AXI bus adapter
@@ -291,19 +292,10 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
     );
   end
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
-    if(!rst_ni) begin
-      bank_idx_q <= '0;
-      bank_off_q <= '0;
-      vld_sel_q  <= '0;
-      cmp_en_q   <= '0;
-    end else begin
-      bank_idx_q <= bank_idx_d;
-      bank_off_q <= bank_off_d;
-      vld_sel_q  <= vld_sel_d ;
-      cmp_en_q   <= cmp_en_d;
-    end
-  end
+  `FFC(bank_idx_q, bank_idx_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(bank_off_q, bank_off_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(vld_sel_q, vld_sel_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(cmp_en_q, cmp_en_d, '0, clk_i, rst_ni, clr_i)
 
 ///////////////////////////////////////////////////////
 // assertions

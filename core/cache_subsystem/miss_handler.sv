@@ -16,6 +16,8 @@
 // MISS Handler
 // --------------
 
+`include "common_cells/registers.svh"
+
 module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     parameter int unsigned NR_PORTS         = 3
 )(
@@ -485,23 +487,12 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     // --------------------
     // Sequential Process
     // --------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            mshr_q        <= '0;
-            state_q       <= INIT;
-            cnt_q         <= '0;
-            evict_way_q   <= '0;
-            evict_cl_q    <= '0;
-            serve_amo_q   <= 1'b0;
-        end else begin
-            mshr_q        <= mshr_d;
-            state_q       <= state_d;
-            cnt_q         <= cnt_d;
-            evict_way_q   <= evict_way_d;
-            evict_cl_q    <= evict_cl_d;
-            serve_amo_q   <= serve_amo_d;
-        end
-    end
+    `FFC(mshr_q, mshr_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(state_q, state_d, INIT, clk_i, rst_ni, clr_i)
+    `FFC(cnt_q, cnt_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(evict_way_q, evict_way_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(evict_cl_q, evict_cl_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(serve_amo_q, serve_amo_d, 1'b0, clk_i, rst_ni, clr_i)
 
     //pragma translate_off
     `ifndef VERILATOR
@@ -549,6 +540,7 @@ module miss_handler import ariane_pkg::*; import std_cache_pkg::*; #(
     ) i_bypass_arbiter (
         .clk_i (clk_i),
         .rst_ni(rst_ni),
+	.clr_i (clr_i),
         // Master Side
         .req_i (bypass_ports_req),
         .rsp_o (bypass_ports_rsp),
@@ -661,6 +653,7 @@ module axi_adapter_arbiter #(
 )(
     input  logic                clk_i,  // Clock
     input  logic                rst_ni, // Asynchronous reset active low
+    input  logic                clr_i,  // Synchronous clear active high
     // Master ports
     input  req_t [NR_PORTS-1:0] req_i,
     output rsp_t [NR_PORTS-1:0] rsp_o,
@@ -713,17 +706,9 @@ module axi_adapter_arbiter #(
         endcase
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q <= IDLE;
-            sel_q   <= '0;
-            req_q   <= '0;
-        end else begin
-            state_q <= state_d;
-            sel_q   <= sel_d;
-            req_q   <= req_d;
-        end
-    end
+    `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+    `FFC(sel_q, sel_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(req_q, req_d, '0, clk_i, rst_ni, clr_i)
     // ------------
     // Assertions
     // ------------

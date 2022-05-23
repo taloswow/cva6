@@ -24,6 +24,7 @@
 // 3) NC accesses to I/O space are expected to return 32bit from memory.
 //
 
+`include "common_cells/registers.svh"
 
 module cva6_icache import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter logic [CACHE_ID_WIDTH-1:0]  RdTxId             = 0,                                  // ID to be used for read transactions
@@ -450,32 +451,16 @@ end else begin : gen_piton_offset
     );
   end
 
-
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
-    if(!rst_ni) begin
-      cl_tag_q      <= '0;
-      flush_cnt_q   <= '0;
-      vaddr_q       <= '0;
-      cmp_en_q      <= '0;
-      cache_en_q    <= '0;
-      flush_q       <= '0;
-      state_q       <= FLUSH;
-      cl_offset_q   <= '0;
-      repl_way_oh_q <= '0;
-      inv_q         <= '0;
-    end else begin
-      cl_tag_q      <= cl_tag_d;
-      flush_cnt_q   <= flush_cnt_d;
-      vaddr_q       <= vaddr_d;
-      cmp_en_q      <= cmp_en_d;
-      cache_en_q    <= cache_en_d;
-      flush_q       <= flush_d;
-      state_q       <= state_d;
-      cl_offset_q   <= cl_offset_d;
-      repl_way_oh_q <= repl_way_oh_d;
-      inv_q         <= inv_d;
-    end
-  end
+  `FFC(cl_tag_q, cl_tag_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(flush_cnt_q, flush_cnt_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(vaddr_q, vaddr_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(cmp_en_q, cmp_en_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(cache_en_q, cache_en_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(flush_q, flush_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(state_q, state_d, FLUSH, clk_i, rst_ni, clr_i)
+  `FFC(cl_offset_q, cl_offset_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(repl_way_oh_q, repl_way_oh_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(inv_q, inv_d, '0, clk_i, rst_ni, clr_i)
 
 ///////////////////////////////////////////////////////
 // assertions
