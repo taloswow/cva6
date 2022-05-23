@@ -302,7 +302,8 @@ module ariane_testharness #(
     .critical_word_o       (                           ),
     .critical_word_valid_o (                           ),
     .axi_req_o             ( dm_axi_m_req              ),
-    .axi_resp_i            ( dm_axi_m_resp             )
+    .axi_resp_i            ( dm_axi_m_resp             ),
+    .busy_o                (                           )
   );
 
 

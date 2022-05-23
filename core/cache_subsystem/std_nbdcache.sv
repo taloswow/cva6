@@ -85,8 +85,10 @@ import std_cache_pkg::*;
     cache_line_t [DCACHE_SET_ASSOC-1:0]  rdata_ram;
     cl_be_t                              be_ram;
 
-    assign busy_o = |busy;
-
+    // Busy signals
+    logic miss_handler_busy;
+    assign busy_o = |busy | miss_handler_busy;
+    
     // ------------------
     // Cache Controller
     // ------------------
@@ -136,6 +138,7 @@ import std_cache_pkg::*;
     miss_handler #(
         .NR_PORTS               ( 3                    )
     ) i_miss_handler (
+        .busy_o                 ( miss_handler_busy    ),
         .flush_i                ( flush_i              ),
 	.clr_i                  ( clr_i                ),
         .busy_i                 ( |busy                ),

@@ -27,6 +27,7 @@ module axi_adapter #(
   input  logic                             rst_ni, // Asynchronous reset active low
   input  logic                             clr_i, // Synchronous clear active high
 
+  output logic                             busy_o,
   input  logic                             req_i,
   input  ariane_axi::ad_req_t              type_i,
   input  ariane_pkg::amo_t                 amo_i,
@@ -66,6 +67,8 @@ module axi_adapter #(
   // save the atomic operation and size
   ariane_pkg::amo_t amo_d, amo_q;
   logic [1:0] size_d, size_q;
+  // Busy if we are not idle
+  assign busy_o = state_q != IDLE;
 
   always_comb begin : axi_fsm
     // Default assignments

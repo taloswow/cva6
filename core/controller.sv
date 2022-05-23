@@ -60,6 +60,7 @@ module controller import ariane_pkg::*; (
 
     // Pad counter
     logic [31:0]      pad_cnt;
+    logic [3:0]       drain_cnt;
     logic             time_irq_q;
     riscv::priv_lvl_t priv_lvl_q;
 
@@ -73,7 +74,7 @@ module controller import ariane_pkg::*; (
     assign rst_addr_o = rst_addr_q;
 
     // fence.t FSM
-    typedef enum logic[1:0] {IDLE, FLUSH_DCACHE, WAIT, RST_UARCH} fence_t_state_e;
+    typedef enum logic[2:0] {IDLE, FLUSH_DCACHE, DRAIN_REQS, PAD, RST_UARCH} fence_t_state_e;
     fence_t_state_e fence_t_state_d, fence_t_state_q;
     logic [3:0]     fence_t_clr_cnt_d, fence_t_clr_cnt_q;
 
@@ -232,16 +233,23 @@ module controller import ariane_pkg::*; (
             // Wait for dcache to acknowledge flush
             FLUSH_DCACHE: begin
                 if (flush_dcache_ack_i) begin
-                    fence_t_state_d = WAIT;
-		    fence_t_ceil_o = (pad_cnt == '0) ? '0 : fence_t_pad_i - pad_cnt;
+                    fence_t_state_d = DRAIN_REQS;
                 end
             end
 
 	    // Wait for all pending (external) transactions to complete,
             // s.t. we do not violate any handshake protocols.
-	    WAIT: begin
+	    DRAIN_REQS: begin
                 // The cache controls our only handshaked interface
-                if (!cache_busy_i && pad_cnt == '0) fence_t_state_d = RST_UARCH;
+		// Wait until it was idle for 16 cycles
+		if (drain_cnt == 4'hf) begin
+                    fence_t_state_d = PAD;
+                    fence_t_ceil_o = (pad_cnt == '0) ? '0 : fence_t_pad_i - pad_cnt;
+                end
+            end
+
+            PAD: begin
+                if (pad_cnt == '0) fence_t_state_d = RST_UARCH;
             end
 
             // Reset microarchitecture
@@ -269,6 +277,22 @@ module controller import ariane_pkg::*; (
 
     assign load_pad_cnt = fence_t_src_sel_i ? ((priv_lvl_q == riscv::PRIV_LVL_U) && (priv_lvl_i != riscv::PRIV_LVL_U))
                                             : (time_irq_i & ~time_irq_q);
+
+    counter #(
+        .WIDTH           ( 4 ),
+        .STICKY_OVERFLOW ( 0 )
+    ) i_drain_cnt (
+        .clk_i,
+        .rst_ni,
+        .clear_i    ( cache_busy_i      ), // Start counting from 0 when cache is busy
+	.reg_clear  ( clr_i             ),
+        .en_i       ( drain_cnt != 4'hf ), // Stop counting when saturated
+        .load_i     ( 1'b0              ),
+        .down_i     ( 1'b0              ),
+        .d_i        ( '0                ),
+        .q_o        ( drain_cnt         ),
+        .overflow_o (                   )
+    );
 
     counter #(
         .WIDTH           ( 32 ),
