@@ -19,9 +19,12 @@
 //
 
 
+`include "common_cells/registers.svh"
+
 module re_name import ariane_pkg::*; (
     input  logic                                   clk_i,    // Clock
     input  logic                                   rst_ni,   // Asynchronous reset active low
+    input  logic                                   clr_i,    // Synchronous clear active high
     input  logic                                   flush_i,  // Flush renaming state
     input  logic                                   flush_unissied_instr_i,
     // from/to scoreboard
@@ -99,13 +102,6 @@ module re_name import ariane_pkg::*; (
     // -------------------
     // Registers
     // -------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            re_name_table_gpr_q <= '0;
-            re_name_table_fpr_q <= '0;
-        end else begin
-            re_name_table_gpr_q <= re_name_table_gpr_n;
-            re_name_table_fpr_q <= re_name_table_fpr_n;
-        end
-    end
+    `FFC(re_name_table_gpr_q, re_name_table_gpr_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(re_name_table_fpr_q, re_name_table_fpr_n, '0, clk_i, rst_ni, clr_i)
 endmodule
