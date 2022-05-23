@@ -14,6 +14,7 @@
 //              address translation unit. SV39 as defined in RISC-V
 //              privilege specification 1.11-WIP
 
+`include "common_cells/registers.svh"
 
 module mmu import ariane_pkg::*; #(
     parameter int unsigned INSTR_TLB_ENTRIES     = 4,

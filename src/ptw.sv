@@ -15,6 +15,8 @@
 
 /* verilator lint_off WIDTH */
 
+`include "common_cells/registers.svh"
+
 module ptw import ariane_pkg::*; #(
         parameter int ASID_WIDTH = 1,
         parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig
@@ -384,7 +386,7 @@ module ptw import ariane_pkg::*; #(
     `FFC(vaddr_q, vaddr_n, '0, clk_i, rst_ni, clr_i)
     `FFC(ptw_pptr_q, ptw_pptr_n, '0, clk_i, rst_ni, clr_i)
     `FFC(global_mapping_q, global_mapping_n, 1'b0, clk_i, rst_ni, clr_i)
-    `FFC(data_rdata_q, data_rdata_n, '0, clk_i, rst_ni, clr_i)
+    `FFC(data_rdata_q, req_port_i.data_rdata, '0, clk_i, rst_ni, clr_i)
     `FFC(data_rvalid_q, req_port_i.data_rvalid, 1'b0, clk_i, rst_ni, clr_i)
 
 endmodule
