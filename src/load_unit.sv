@@ -13,11 +13,14 @@
 // Date: 15.08.2018
 // Description: Load Unit, takes care of all load requests
 
+`include "common_cells/registers.svh"
+
 module load_unit import ariane_pkg::*; #(
     parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig
 ) (
     input  logic                     clk_i,    // Clock
     input  logic                     rst_ni,   // Asynchronous reset active low
+    input  logic                     clr_i,    // Synchronous clear active high
     input  logic                     flush_i,
     // load unit input port
     input  logic                     valid_i,
@@ -300,15 +303,8 @@ module load_unit import ariane_pkg::*; #(
 
 
     // latch physical address for the tag cycle (one cycle after applying the index)
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q     <= IDLE;
-            load_data_q <= '0;
-        end else begin
-            state_q     <= state_d;
-            load_data_q <= load_data_d;
-        end
-    end
+    `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+    `FFC(load_data_q, load_data_d, '0, clk_i, rst_ni, clr_i)
 
     // ---------------
     // Sign Extend
@@ -369,17 +365,9 @@ module load_unit import ariane_pkg::*; #(
         endcase
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
-        if (~rst_ni) begin
-            idx_q     <= 0;
-            signed_q  <= 0;
-            fp_sign_q <= 0;
-        end else begin
-            idx_q     <= idx_d;
-            signed_q  <= signed_d;
-            fp_sign_q <= fp_sign_d;
-        end
-    end
+    `FFC(idx_q, idx_d, 0, clk_i, rst_ni, clr_i)
+    `FFC(signed_q, signed_d, 0, clk_i, rst_ni, clr_i)
+    `FFC(fp_sign_q, fp_sign_d, 0, clk_i, rst_ni, clr_i)
     // end result mux fast
 
 ///////////////////////////////////////////////////////
