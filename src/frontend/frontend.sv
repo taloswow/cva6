@@ -109,6 +109,7 @@ module frontend import ariane_pkg::*; #(
     instr_realign i_instr_realign (
       .clk_i               ( clk_i                 ),
       .rst_ni              ( rst_ni                ),
+      .clr_i               ( clr_i                 ),
       .flush_i             ( icache_dreq_o.kill_s2 ),
       .valid_i             ( icache_valid_q        ),
       .serving_unaligned_o ( serving_unaligned     ),
