@@ -274,8 +274,8 @@ module controller import ariane_pkg::*; (
         endcase
     end
 
-    // Let dcache not accept new memory requests after flushing until reset
-    assign stall_cache_o = (fence_t_state_q inside {DRAIN_REQS, PAD, RST_UARCH});
+    // Let the caches not accept new memory requests during fence_t
+    assign stall_cache_o = (fence_t_state_q != IDLE);
 
     // Start padding either from CLINT timer interrupt [0]
     // or executing leaving U-mode [1]
