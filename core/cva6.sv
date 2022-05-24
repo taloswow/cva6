@@ -249,6 +249,7 @@ module cva6 import ariane_pkg::*; #(
   logic                     flush_commit;
   logic [riscv::VLEN-1:0]   rst_addr_ctrl_if;
   logic                     busy_cache_ctrl;
+  logic                     stall_ctrl_cache;
   logic                     init_ctrl_cache_n;
 
   icache_areq_i_t           icache_areq_ex_cache;
@@ -649,6 +650,7 @@ module cva6 import ariane_pkg::*; #(
     .fence_t_clr_o          ( clr_o                         ),
     .rst_addr_o             ( rst_addr_ctrl_if              ),
     .cache_busy_i           ( busy_cache_ctrl               ),
+    .stall_cache_o          ( stall_ctrl_cache              ),
     .cache_init_no          ( init_ctrl_cache_n             ),
     .fence_t_pad_i          ( fence_t_pad_csr_ctrl          ),
     .fence_t_src_sel_i      ( fence_t_src_sel_csr_ctrl      ),
@@ -690,6 +692,7 @@ module cva6 import ariane_pkg::*; #(
     .rst_ni                ( rst_ni                      ),
     .clr_i                 ( clr_uarch                   ),
     .busy_o                ( busy_cache_ctrl             ),
+    .stall_i               ( stall_ctrl_cache            ),
     .init_ni               ( init_ctrl_cache_n           ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
@@ -736,6 +739,7 @@ module cva6 import ariane_pkg::*; #(
     .clr_i                 ( clr_uarch                   ),
     .priv_lvl_i            ( priv_lvl                    ),
     .busy_o                ( busy_cache_ctrl             ),
+    .stall_i               ( stall_ctrl_cache            ),
     .init_ni               ( init_ctrl_cache_n           ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
