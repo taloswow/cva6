@@ -350,18 +350,7 @@ module instr_realign import ariane_pkg::*; (
         end
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            unaligned_q         <= 1'b0;
-        end else begin
-
-            if (flush_i) begin
-                unaligned_q <= 1'b0;
-            end else if (valid_i) begin
-                unaligned_q <= unaligned_d;
-            end
-        end
-    end
+    `FFC(unaligned_q, unaligned_in, 1'b0, clk_i, rst_ni, clr_i)
     `FFLARNC(unaligned_address_q, unaligned_address_d, valid_i, clr_i, '0, clk_i, rst_ni)
     `FFLARNC(unaligned_instr_q, unaligned_instr_d, valid_i, clr_i, '0, clk_i, rst_ni)
 endmodule
