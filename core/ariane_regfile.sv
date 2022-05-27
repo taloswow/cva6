@@ -32,6 +32,7 @@ module ariane_regfile_lol #(
   // clock and reset
   input  logic                                      clk_i,
   input  logic                                      rst_ni,
+  input  logic                                      clr_i,
   // disable clock gates for testing
   input  logic                                      test_en_i,
   // read port
@@ -61,12 +62,16 @@ module ariane_regfile_lol #(
         if (~rst_ni) begin
             wdata_q <= '0;
         end else begin
-            for (int unsigned i = 0; i < NR_WRITE_PORTS; i++)
-                // enable flipflop will most probably infer clock gating
-                if (we_i[i]) begin
-                    wdata_q[i]     <= wdata_i[i];
-                end
-            waddr_onehot_q <= waddr_onehot;
+            if (clr_i) begin
+                wdata_q <= '0;
+            end else begin
+                for (int unsigned i = 0; i < NR_WRITE_PORTS; i++)
+                    // enable flipflop will most probably infer clock gating
+                    if (we_i[i]) begin
+                        wdata_q[i]     <= wdata_i[i];
+                    end
+                waddr_onehot_q <= waddr_onehot;
+            end
         end
     end
 
