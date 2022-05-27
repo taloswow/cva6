@@ -19,6 +19,7 @@ module btb #(
 )(
     input  logic                        clk_i,           // Clock
     input  logic                        rst_ni,          // Asynchronous reset active low
+    input  logic                        clr_i,           // Synchronous clear active high
     input  logic                        flush_i,         // flush the btb
     input  logic                        debug_mode_i,
 
@@ -76,8 +77,11 @@ module btb #(
             for (int i = 0; i < NR_ROWS; i++)
                 btb_q[i] <= '{default: 0};
         end else begin
+            if (clr_i) begin
+                for (int i = 0; i < NR_ROWS; i++)
+                    btb_q[i] <= '{default: 0};
             // evict all entries
-            if (flush_i) begin
+	    end else if (flush_i) begin
                 for (int i = 0; i < NR_ROWS; i++) begin
                     for (int j = 0; j < ariane_pkg::INSTR_PER_FETCH; j++) begin
                         btb_q[i][j].valid <=  1'b0;

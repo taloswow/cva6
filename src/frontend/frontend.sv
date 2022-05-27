@@ -373,6 +373,7 @@ module frontend import ariane_pkg::*; #(
     ) i_btb (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .flush_i          ( flush_bp_i       ),
       .debug_mode_i,
       .vpc_i            ( icache_vaddr_q   ),
@@ -385,6 +386,7 @@ module frontend import ariane_pkg::*; #(
     ) i_bht (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .flush_i          ( flush_bp_i       ),
       .debug_mode_i,
       .vpc_i            ( icache_vaddr_q   ),
