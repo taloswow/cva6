@@ -19,6 +19,7 @@ module bht #(
 )(
     input  logic                        clk_i,
     input  logic                        rst_ni,
+    input  logic                        clr_i,
     input  logic                        flush_i,
     input  logic                        debug_mode_i,
     input  logic [riscv::VLEN-1:0]      vpc_i,
@@ -94,8 +95,14 @@ module bht #(
                 end
             end
         end else begin
+            if (clr_i) begin
+                for (int unsigned i = 0; i < NR_ROWS; i++) begin
+                    for (int j = 0; j < ariane_pkg::INSTR_PER_FETCH; j++) begin
+                        bht_q[i][j] <= 0;
+                    end
+                end
             // evict all entries
-            if (flush_i) begin
+	    end else if (flush_i) begin
                 for (int i = 0; i < NR_ROWS; i++) begin
                     for (int j = 0; j < ariane_pkg::INSTR_PER_FETCH; j++) begin
                         bht_q[i][j].valid <=  1'b0;
