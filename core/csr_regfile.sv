@@ -1086,18 +1086,23 @@ module csr_regfile import ariane_pkg::*; #(
             pmpcfg_q               <= '0;
             pmpaddr_q              <= '0;
         end else begin
+            if (clr_i) begin
+                pmpcfg_q  <= '0;
+		pmpaddr_q <= '0;
+            end else begin
             // pmp
-            for(int i = 0; i < 16; i++) begin
-                if(i < NrPMPEntries) begin
-                    // We only support >=8-byte granularity, NA4 is disabled
-                    if(pmpcfg_d[i].addr_mode != riscv::NA4 && !(pmpcfg_d[i].access_type.r == '0 && pmpcfg_d[i].access_type.w == '1)) 
-                        pmpcfg_q[i] <= pmpcfg_d[i];
-                    else
-                        pmpcfg_q[i] <= pmpcfg_q[i];
-                    pmpaddr_q[i] <= pmpaddr_d[i];
-                end else begin
-                    pmpcfg_q[i] <= '0;
-                    pmpaddr_q[i] <= '0;
+                for(int i = 0; i < 16; i++) begin
+                    if(i < NrPMPEntries) begin
+                        // We only support >=8-byte granularity, NA4 is disabled
+                        if(pmpcfg_d[i].addr_mode != riscv::NA4 && !(pmpcfg_d[i].access_type.r == '0 && pmpcfg_d[i].access_type.w == '1)) 
+                            pmpcfg_q[i] <= pmpcfg_d[i];
+                        else
+                            pmpcfg_q[i] <= pmpcfg_q[i];
+                        pmpaddr_q[i] <= pmpaddr_d[i];
+                    end else begin
+                        pmpcfg_q[i] <= '0;
+                        pmpaddr_q[i] <= '0;
+                    end
                 end
             end
         end
