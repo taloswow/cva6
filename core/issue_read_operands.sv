@@ -477,6 +477,7 @@ module issue_read_operands import ariane_pkg::*; #(
         .waddr_i   ( waddr_pack ),
         .wdata_i   ( wdata_pack ),
         .we_i      ( we_pack    ),
+	.clr_i     ( clr_all_i  ),
         .*
     );
 
@@ -508,6 +509,7 @@ module issue_read_operands import ariane_pkg::*; #(
                 .waddr_i   ( waddr_pack    ),
                 .wdata_i   ( wdata_pack    ),
                 .we_i      ( we_fpr_i      ),
+		.clr_i     ( clr_all_i     ),
                 .*
             );
         end else begin : no_fpr_gen
