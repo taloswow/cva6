@@ -26,6 +26,7 @@
 // 2020-02-17  0.1      S.Jacq       MMU Sv32 for CV32A6
 // =========================================================================== //
 
+`include "common_cells/registers.svh"
 
 module cva6_mmu_sv32 import ariane_pkg::*; #(
     parameter int unsigned INSTR_TLB_ENTRIES     = 4,
