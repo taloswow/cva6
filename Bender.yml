@@ -20,6 +20,7 @@ sources:
     - core/include/riscv_pkg.sv
     - corev_apu/riscv-dbg/src/dm_pkg.sv
     - core/include/ariane_pkg.sv
+    - core/include/cvxif_pkg.sv
     - core/include/wt_cache_pkg.sv
     - corev_apu/axi/src/axi_pkg.sv
     - corev_apu/register_interface/src/reg_intf.sv
