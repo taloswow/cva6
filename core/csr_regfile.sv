@@ -12,6 +12,7 @@
 // Date: 05.05.2017
 // Description: CSR Register File as specified by RISC-V
 
+`include "common_cells/registers.svh"
 
 module csr_regfile import ariane_pkg::*; #(
     parameter logic [63:0] DmBaseAddress   = 64'h0, // debug module base address
