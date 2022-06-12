@@ -5,8 +5,6 @@ package:
     - "Michael Schaffner <schaffner@iis.ee.ethz.ch>"
     - "Andreas Kuster <kustera@ethz.ch>"
 
-# WT_DCACHE
-
 export_include_dirs:
   - common/submodules/common_cells/include/
   - corev_apu/axi/include/
