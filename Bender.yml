@@ -5,6 +5,10 @@ package:
     - "Michael Schaffner <schaffner@iis.ee.ethz.ch>"
     - "Andreas Kuster <kustera@ethz.ch>"
 
+dependencies:
+  common_cells: { git: "git@github.com:taloswow/common_cells", rev: stepbystep }
+  fpnew: { git: "git@github.com:taloswow/fpnew", rev: stepbystep }
+
 sources:
   - files:
     - target: not(cv32a6)
