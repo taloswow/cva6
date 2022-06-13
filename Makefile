@@ -239,11 +239,7 @@ src :=  $(filter-out core/ariane_regfile.sv, $(wildcard core/*.sv))             
         common/submodules/common_cells/src/delta_counter.sv                          \
         common/submodules/common_cells/src/counter.sv                                \
         common/submodules/common_cells/src/shift_reg.sv                              \
-        corev_apu/src/tech_cells_generic/src/deprecated/cluster_clk_cells.sv         \
-        corev_apu/src/tech_cells_generic/src/deprecated/pulp_clk_cells.sv            \
         common/local/util/tc_sram_wrapper.sv                                         \
-        corev_apu/src/tech_cells_generic/src/rtl/tc_sram.sv                          \
-        corev_apu/src/tech_cells_generic/src/rtl/tc_clk.sv                           \
         common/submodules/common_cells/src/sub_per_hash.sv                           \
         common/submodules/common_cells/src/cb_filter.sv                              \
         common/submodules/common_cells/src/stream_fifo.sv                            \
