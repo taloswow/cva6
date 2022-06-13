@@ -8,6 +8,10 @@ package:
 export_include_dirs:
   - common/submodules/common_cells/include/
 
+dependencies:
+  common_cells: { git: "https://github.com/taloswow/common_cells", rev: "stepbystep" }
+  fpnew: { git: "https://github.com/taloswow/fpnew", rev: "stepbystep" }
+
 sources:
   - files:
     - target: not(cv32a6)
