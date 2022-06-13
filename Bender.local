@@ -1,0 +1,3 @@
+overrides:
+  common_cells: { git: "https://github.com/taloswow/common_cells", rev:"stepbystep" }
+  fpnew: { git: "https://github.com/taloswow/fpnew", rev:"stepbystep" }
