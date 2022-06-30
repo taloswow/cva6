@@ -499,7 +499,6 @@ module fpu_wrap import ariane_pkg::*; (
     ) i_fpnew_bulk (
       .clk_i,
       .rst_ni,
-      .clr_i,
       .operands_i     ( fpu_operands                        ),
       .rnd_mode_i     ( fpnew_pkg::roundmode_e'(fpu_rm)     ),
       .op_i           ( fpnew_pkg::operation_e'(fpu_op)     ),
