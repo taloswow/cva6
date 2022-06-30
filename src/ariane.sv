@@ -263,21 +263,13 @@ module ariane import ariane_pkg::*; #(
   logic                     dcache_commit_wbuffer_empty;
   logic                     dcache_commit_wbuffer_not_ni;
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin
-    if (~rst_ni) begin
-      rst_uarch_n <= 1'b0;
-    end else begin
-      rst_uarch_n <= rst_uarch_controller_n;
-    end
-  end
-
   // --------------
   // Frontend
   // --------------
   frontend #(
     .ArianeCfg ( ArianeCfg )
   ) i_frontend (
-    .rst_ni              ( rst_uarch_n                   ),
+    .rst_ni              ( rst_ni                        ),
     .flush_i             ( flush_ctrl_if                 ), // not entirely correct
     .flush_bp_i          ( 1'b0                          ),
     .debug_mode_i        ( debug_mode                    ),
@@ -495,7 +487,7 @@ module ariane import ariane_pkg::*; #(
     .NR_COMMIT_PORTS ( NR_COMMIT_PORTS )
   ) commit_stage_i (
     .clk_i,
-    .rst_ni                 ( rst_uarch_n                   ),
+    .rst_ni                 ( rst_ni                        ),
     .halt_i                 ( halt_ctrl                     ),
     .flush_dcache_i         ( dcache_flush_ctrl_cache       ),
     .exception_o            ( ex_commit                     ),
@@ -632,7 +624,6 @@ module ariane import ariane_pkg::*; #(
     .flush_tlb_o            ( flush_tlb_ctrl_ex             ),
     .flush_dcache_o         ( dcache_flush_ctrl_cache       ),
     .flush_dcache_ack_i     ( dcache_flush_ack_cache_ctrl   ),
-    .rst_uarch_no           ( rst_uarch_controller_n        ),
     .rst_addr_o             ( rst_addr_ctrl_if              ),
     .cache_busy_i           ( busy_cache_ctrl               ),
     .stall_cache_o          ( stall_ctrl_cache              ),

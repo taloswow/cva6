@@ -220,7 +220,6 @@ module controller import ariane_pkg::*; (
         // Default assignments
         fence_t_state_d = fence_t_state_q;
         rst_uarch_cnt_d = rst_uarch_cnt_q;
-        rst_uarch_no    = 1'b1;
         fence_t_ceil_o  = '0;
         cache_init_d[0] = 1'b0;
 
@@ -253,7 +252,6 @@ module controller import ariane_pkg::*; (
 
             // Reset microarchitecture
             RST_UARCH: begin
-                rst_uarch_no    = 1'b0;
                 cache_init_d[0] = 1'b1;
 
                 // Return to IDLE after 16 cycles
