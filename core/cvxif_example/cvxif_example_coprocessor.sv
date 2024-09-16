@@ -12,7 +12,8 @@
 module cvxif_example_coprocessor import cvxif_pkg::*;
                                  import cvxif_instr_pkg::*;(
     input   logic                   clk_i,                      // Clock
-    input   logic                   rst_ni,                     // Asynchronous reset active low
+    input   logic                   rst_ni,
+    input   logic                   clr_i,    // Asynchronous reset active low
     input   cvxif_req_t             cvxif_req_i,
     output  cvxif_resp_t            cvxif_resp_o
 );
@@ -98,13 +99,7 @@ module cvxif_example_coprocessor import cvxif_pkg::*;
   assign req_i.req = x_issue_req_i;
   assign req_i.resp = x_issue_resp_o;
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin : regs
-    if(!rst_ni) begin
-      x_issue_ready_o <= 1;
-    end else begin
-      x_issue_ready_o <= x_issue_ready_q;
-    end
-  end
+  `FFC(x_issue_ready_o, x_issue_ready_q, 1, clk_i, rst_ni, clr_i)
 
   fifo_v3 #(
     .FALL_THROUGH ( 1         ), //data_o ready and pop in the same cycle
@@ -114,6 +109,7 @@ module cvxif_example_coprocessor import cvxif_pkg::*;
     ) fifo_commit_i (
     .clk_i        ( clk_i      ),
     .rst_ni       ( rst_ni     ),
+    .clr_i        ( 1'b0       ),
     .flush_i      ( 1'b0       ),
     .testmode_i   ( 1'b0       ),
     .full_o       ( fifo_full  ),

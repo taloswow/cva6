@@ -12,6 +12,7 @@
 // Date: 05.05.2017
 // Description: CSR Register File as specified by RISC-V
 
+`include "common_cells/registers.svh"
 
 module csr_regfile import ariane_pkg::*; #(
     parameter logic [63:0] DmBaseAddress   = 64'h0, // debug module base address
@@ -21,6 +22,7 @@ module csr_regfile import ariane_pkg::*; #(
 ) (
     input  logic                  clk_i,                      // Clock
     input  logic                  rst_ni,                     // Asynchronous reset active low
+    input  logic                  clr_i,                      // Synchronous clear active high
     input  logic                  time_irq_i,                 // Timer threw a interrupt
     // send a flush request out if a CSR with a side effect has changed (e.g. written)
     output logic                  flush_o,
@@ -1079,98 +1081,60 @@ module csr_regfile import ariane_pkg::*; #(
     assign single_step_o    = dcsr_q.step;
 
     // sequential process
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            priv_lvl_q             <= riscv::PRIV_LVL_M;
-            // floating-point registers
-            fcsr_q                 <= '0;
-            // debug signals
+    `FFC(priv_lvl_q, priv_lvl_d, riscv::PRIV_LVL_M, clk_i, rst_ni, clr_i)
+    // floating-point registers
+    `FFC(fcsr_q, fcsr_d, '0, clk_i, rst_ni, clr_i)
+    // debug signals
 `ifdef DROMAJO
-            debug_mode_q           <= 1'b1;
+    `FFC(debug_mode_q, debug_mode_d, 1'b1, clk_i, rst_ni, clr_i)
 `else
-            debug_mode_q           <= 1'b0;
+    `FFC(debug_mode_q, debug_mode_d, 1'b0, clk_i, rst_ni, clr_i)
 `endif
-            dcsr_q                 <= '0;
+    `FFC(dcsr_q, dcsr_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(dpc_q, dpc_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(dscratch0_q, dscratch0_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(dscratch1_q, dscratch1_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    // machine mode registers
+    `FFC(mstatus_q, mstatus_d, 64'b0, clk_i, rst_ni, clr_i)
+    // set to boot address + direct mode + 4 offset byte which is the initial
+    // trap
+    `FFC(mtvec_rst_load_q, 1'b0, 1'b1, clk_i, rst_ni, clr_i)
+    `FFC(mtvec_q, mtvec_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(medeleg_q, medeleg_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mideleg_q, mideleg_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mip_q, mip_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mie_q, mie_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mepc_q, mepc_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mcause_q, mcause_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mcounteren_q, mcounteren_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mscratch_q, mscratch_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(mtval_q, mtval_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(dcache_q, dcache_d, {{riscv::XLEN-1{1'b0}}, 1'b1}, clk_i, rst_ni, clr_i)
+    `FFC(icache_q, icache_d, {{riscv::XLEN-1{1'b0}}, 1'b1}, clk_i, rst_ni, clr_i)
+    // supervisor mode registers
+    `FFC(sepc_q, sepc_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(scause_q, scause_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(stvec_q, stvec_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(scounteren_q, scounteren_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(sscratch_q, sscratch_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(stval_q, stval_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(satp_q, satp_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    // timer and counters
+    `FFC(cycle_q, cycle_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    `FFC(instret_q, instret_d, {riscv::XLEN{1'b0}}, clk_i, rst_ni, clr_i)
+    // aux registers
+    `FFC(en_ld_st_translation_q, en_ld_st_translation_d, 1'b0, clk_i, rst_ni, clr_i)
+    // wait for interrupt
+    `FFC(wfi_q, wfi_d, 1'b0, clk_i, rst_ni, clr_i)
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (~rst_ni || clr_i) begin
             dcsr_q.prv             <= riscv::PRIV_LVL_M;
             dcsr_q.xdebugver       <= 4'h4;
-            dpc_q                  <= '0;
-            dscratch0_q            <= {riscv::XLEN{1'b0}};
-            dscratch1_q            <= {riscv::XLEN{1'b0}};
-            // machine mode registers
-            mstatus_q              <= 64'b0;
-            // set to boot address + direct mode + 4 byte offset which is the initial trap
-            mtvec_rst_load_q       <= 1'b1;
-            mtvec_q                <= '0;
-            medeleg_q              <= {riscv::XLEN{1'b0}};
-            mideleg_q              <= {riscv::XLEN{1'b0}};
-            mip_q                  <= {riscv::XLEN{1'b0}};
-            mie_q                  <= {riscv::XLEN{1'b0}};
-            mepc_q                 <= {riscv::XLEN{1'b0}};
-            mcause_q               <= {riscv::XLEN{1'b0}};
-            mcounteren_q           <= {riscv::XLEN{1'b0}};
-            mscratch_q             <= {riscv::XLEN{1'b0}};
-            mtval_q                <= {riscv::XLEN{1'b0}};
-            dcache_q               <= {{riscv::XLEN-1{1'b0}}, 1'b1};
-            icache_q               <= {{riscv::XLEN-1{1'b0}}, 1'b1};
-            // supervisor mode registers
-            sepc_q                 <= {riscv::XLEN{1'b0}};
-            scause_q               <= {riscv::XLEN{1'b0}};
-            stvec_q                <= {riscv::XLEN{1'b0}};
-            scounteren_q           <= {riscv::XLEN{1'b0}};
-            sscratch_q             <= {riscv::XLEN{1'b0}};
-            stval_q                <= {riscv::XLEN{1'b0}};
-            satp_q                 <= {riscv::XLEN{1'b0}};
-            // timer and counters
-            cycle_q                <= {riscv::XLEN{1'b0}};
-            instret_q              <= {riscv::XLEN{1'b0}};
-            // aux registers
-            en_ld_st_translation_q <= 1'b0;
-            // wait for interrupt
-            wfi_q                  <= 1'b0;
-            // pmp
+	    // pmp
             pmpcfg_q               <= '0;
             pmpaddr_q              <= '0;
         end else begin
-            priv_lvl_q             <= priv_lvl_d;
-            // floating-point registers
-            fcsr_q                 <= fcsr_d;
-            // debug signals
-            debug_mode_q           <= debug_mode_d;
-            dcsr_q                 <= dcsr_d;
-            dpc_q                  <= dpc_d;
-            dscratch0_q            <= dscratch0_d;
-            dscratch1_q            <= dscratch1_d;
-            // machine mode registers
-            mstatus_q              <= mstatus_d;
-            mtvec_rst_load_q       <= 1'b0;
-            mtvec_q                <= mtvec_d;
-            medeleg_q              <= medeleg_d;
-            mideleg_q              <= mideleg_d;
-            mip_q                  <= mip_d;
-            mie_q                  <= mie_d;
-            mepc_q                 <= mepc_d;
-            mcause_q               <= mcause_d;
-            mcounteren_q           <= mcounteren_d;
-            mscratch_q             <= mscratch_d;
-            mtval_q                <= mtval_d;
-            dcache_q               <= dcache_d;
-            icache_q               <= icache_d;
-            // supervisor mode registers
-            sepc_q                 <= sepc_d;
-            scause_q               <= scause_d;
-            stvec_q                <= stvec_d;
-            scounteren_q           <= scounteren_d;
-            sscratch_q             <= sscratch_d;
-            stval_q                <= stval_d;
-            satp_q                 <= satp_d;
-            // timer and counters
-            cycle_q                <= cycle_d;
-            instret_q              <= instret_d;
-            // aux registers
-            en_ld_st_translation_q <= en_ld_st_translation_d;
-            // wait for interrupt
-            wfi_q                  <= wfi_d;
-            // pmp
+           // pmp
             for(int i = 0; i < 16; i++) begin
                 if(i < NrPMPEntries) begin
                     // We only support >=8-byte granularity, NA4 is disabled

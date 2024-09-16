@@ -25,6 +25,7 @@
 //        4) Read ports with same priority are RR arbited. but high prio ports (rd_prio_i[port_nr] = '1b1) will stall
 //           low prio ports (rd_prio_i[port_nr] = '1b0)
 
+`include "common_cells/registers.svh"
 
 module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter bit          Axi64BitCompliant  = 1'b0, // set this to 1 when using in conjunction with 64bit AXI bus adapter
@@ -32,6 +33,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input  logic                                              clk_i,
   input  logic                                              rst_ni,
+  input  logic                                              clr_i,
 
   // ports
   input  logic  [NumPorts-1:0][DCACHE_TAG_WIDTH-1:0]        rd_tag_i,           // tag in - comes one cycle later
@@ -140,6 +142,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rr_arb_tree (
     .clk_i  (clk_i   ),
     .rst_ni (rst_ni  ),
+    .clr_i  (clr_i   ),
     .flush_i('0      ),
     .rr_i   ('0      ),
     .req_i  (rd_req_masked ),
@@ -258,6 +261,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
     ) i_data_sram (
       .clk_i      ( clk_i               ),
       .rst_ni     ( rst_ni              ),
+      .clr_i      ( clr_i               ),
       .req_i      ( bank_req   [k]      ),
       .we_i       ( bank_we    [k]      ),
       .addr_i     ( bank_idx   [k]      ),
@@ -280,6 +284,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
     ) i_tag_sram (
       .clk_i     ( clk_i               ),
       .rst_ni    ( rst_ni              ),
+      .clr_i     ( clr_i               ),
       .req_i     ( vld_req[i]          ),
       .we_i      ( vld_we              ),
       .addr_i    ( vld_addr            ),
@@ -289,19 +294,10 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
     );
   end
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_regs
-    if(!rst_ni) begin
-      bank_idx_q <= '0;
-      bank_off_q <= '0;
-      vld_sel_q  <= '0;
-      cmp_en_q   <= '0;
-    end else begin
-      bank_idx_q <= bank_idx_d;
-      bank_off_q <= bank_off_d;
-      vld_sel_q  <= vld_sel_d ;
-      cmp_en_q   <= cmp_en_d;
-    end
-  end
+  `FFC(bank_idx_q, bank_idx_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(bank_off_q, bank_off_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(vld_sel_q, vld_sel_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(cmp_en_q, cmp_en_d, '0, clk_i, rst_ni, clr_i)
 
 ///////////////////////////////////////////////////////
 // assertions
@@ -328,7 +324,7 @@ module wt_dcache_mem import ariane_pkg::*; import wt_cache_pkg::*; #(
   logic [ariane_pkg::DCACHE_SET_ASSOC-1:0] tag_write_duplicate_test;
 
   always_ff @(posedge clk_i or negedge rst_ni) begin : p_mirror
-    if(!rst_ni) begin
+    if(!rst_ni || clr_i) begin
       vld_mirror <= '{default:'0};
       tag_mirror <= '{default:'0};
     end else begin

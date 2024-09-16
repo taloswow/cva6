@@ -13,6 +13,7 @@
 // Description: adapter module to connect the L1D$ and L1I$ to a 64bit AXI bus.
 //
 
+`include "common_cells/registers.svh"
 
 module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   parameter int unsigned ReqFifoDepth  = 2,
@@ -20,6 +21,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input logic                  clk_i,
   input logic                  rst_ni,
+  input logic                  clr_i,
 
   // icache
   input  logic                 icache_data_req_i,
@@ -104,6 +106,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rr_arb_tree (
     .clk_i  (clk_i   ),
     .rst_ni (rst_ni  ),
+    .clr_i  (clr_i   ),
     .flush_i('0      ),
     .rr_i   ('0      ),
     .req_i  (arb_req ),
@@ -235,6 +238,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_icache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  icache_data_full        ),
@@ -252,6 +256,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_dcache_data_fifo (
     .clk_i       (  clk_i                   ),
     .rst_ni      (  rst_ni                  ),
+    .clr_i       (  clr_i                   ),
     .flush_i     (  1'b0                    ),
     .testmode_i  (  1'b0                    ),
     .full_o      (  dcache_data_full        ),
@@ -276,6 +281,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rd_icache_id (
     .clk_i      ( clk_i                   ),
     .rst_ni     ( rst_ni                  ),
+    .clr_i      ( clr_i                   ),
     .flush_i    ( 1'b0                    ),
     .testmode_i ( 1'b0                    ),
     .full_o     ( icache_rd_full          ),
@@ -293,6 +299,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_rd_dcache_id (
     .clk_i      ( clk_i                   ),
     .rst_ni     ( rst_ni                  ),
+    .clr_i      ( clr_i                   ),
     .flush_i    ( 1'b0                    ),
     .testmode_i ( 1'b0                    ),
     .full_o     ( dcache_rd_full          ),
@@ -310,6 +317,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_wr_dcache_id (
     .clk_i      ( clk_i                   ),
     .rst_ni     ( rst_ni                  ),
+    .clr_i      ( clr_i                   ),
     .flush_i    ( 1'b0                    ),
     .testmode_i ( 1'b0                    ),
     .full_o     ( dcache_wr_full          ),
@@ -340,6 +348,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_b_fifo (
     .clk_i      ( clk_i      ),
     .rst_ni     ( rst_ni     ),
+    .clr_i      ( clr_i      ),
     .flush_i    ( 1'b0       ),
     .testmode_i ( 1'b0       ),
     .full_o     ( b_full     ),
@@ -502,35 +511,18 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   // assign dcache_rtrn_o.inv.vld  = '0;
   // assign dcache_rtrn_o.inv.all  = '0;
 
-  always_ff @(posedge clk_i or negedge rst_ni) begin : p_rd_buf
-    if (!rst_ni) begin
-      icache_first_q     <= 1'b1;
-      dcache_first_q     <= 1'b1;
-      icache_rd_shift_q  <= '0;
-      dcache_rd_shift_q  <= '0;
-      icache_rtrn_vld_q  <= '0;
-      dcache_rtrn_vld_q  <= '0;
-      icache_rtrn_tid_q  <= '0;
-      dcache_rtrn_tid_q  <= '0;
-      dcache_rtrn_type_q <= wt_cache_pkg::DCACHE_LOAD_ACK;
-      dcache_rtrn_inv_q  <= '0;
-      amo_off_q          <= '0;
-      amo_gen_r_q        <= 1'b0;
-    end else begin
-      icache_first_q     <= icache_first_d;
-      dcache_first_q     <= dcache_first_d;
-      icache_rd_shift_q  <= icache_rd_shift_d;
-      dcache_rd_shift_q  <= dcache_rd_shift_d;
-      icache_rtrn_vld_q  <= icache_rtrn_vld_d;
-      dcache_rtrn_vld_q  <= dcache_rtrn_vld_d;
-      icache_rtrn_tid_q  <= icache_rtrn_tid_d;
-      dcache_rtrn_tid_q  <= dcache_rtrn_tid_d;
-      dcache_rtrn_type_q <= dcache_rtrn_type_d;
-      dcache_rtrn_inv_q  <= dcache_rtrn_inv_d;
-      amo_off_q          <= amo_off_d;
-      amo_gen_r_q        <= amo_gen_r_d;
-    end
-  end
+  `FFC(icache_first_q, icache_first_d, 1'b1, clk_i, rst_ni, clr_i)
+  `FFC(dcache_first_q, dcache_first_d, 1'b1, clk_i, rst_ni, clr_i)
+  `FFC(icache_rd_shift_q, icache_rd_shift_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(dcache_rd_shift_q, dcache_rd_shift_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(icache_rtrn_vld_q, icache_rtrn_vld_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(dcache_rtrn_vld_q, dcache_rtrn_vld_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(icache_rtrn_tid_q, icache_rtrn_tid_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(dcache_rtrn_tid_q, dcache_rtrn_tid_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(dcache_rtrn_type_q, dcache_rtrn_type_d, wt_cache_pkg::DCACHE_LOAD_ACK, clk_i, rst_ni, clr_i)
+  `FFC(dcache_rtrn_inv_q, dcache_rtrn_inv_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(amo_off_q, amo_off_d, '0, clk_i, rst_ni, clr_i)
+  `FFC(amo_gen_r_q, amo_gen_r_d, 1'b0, clk_i, rst_ni, clr_i)
 
 
 ///////////////////////////////////////////////////////
@@ -543,6 +535,7 @@ module wt_axi_adapter import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_axi_shim (
     .clk_i           ( clk_i             ),
     .rst_ni          ( rst_ni            ),
+    .clr_i           ( clr_i             ),
     .rd_req_i        ( axi_rd_req        ),
     .rd_gnt_o        ( axi_rd_gnt        ),
     .rd_addr_i       ( axi_rd_addr       ),

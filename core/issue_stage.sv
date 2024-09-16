@@ -13,6 +13,7 @@
 // Description: Issue stage dispatches instructions to the FUs and keeps track of them
 //              in a scoreboard like data-structure.
 
+`include "common_cells/registers.svh"
 
 module issue_stage import ariane_pkg::*; #(
     parameter int unsigned NR_ENTRIES = 8,
@@ -21,6 +22,7 @@ module issue_stage import ariane_pkg::*; #(
 )(
     input  logic                                     clk_i,     // Clock
     input  logic                                     rst_ni,    // Asynchronous reset active low
+    input  logic                                     clr_i,     // Synchronous clear active high
 
     output logic                                     sb_full_o,
     input  logic                                     flush_unissued_instr_i,
@@ -111,6 +113,7 @@ module issue_stage import ariane_pkg::*; #(
     re_name i_re_name (
         .clk_i                  ( clk_i                        ),
         .rst_ni                 ( rst_ni                       ),
+	.clr_i                  ( clr_i                        ),
         .flush_i                ( flush_i                      ),
         .flush_unissied_instr_i ( flush_unissued_instr_i       ),
         .issue_instr_i          ( decoded_instr_i              ),
@@ -154,6 +157,8 @@ module issue_stage import ariane_pkg::*; #(
         .trans_id_i            ( trans_id_i                                ),
         .wbdata_i              ( wbdata_i                                  ),
         .ex_i                  ( ex_ex_i                                   ),
+
+	.clr_i                 ( clr_i                                     ),
         .*
     );
 
@@ -187,6 +192,8 @@ module issue_stage import ariane_pkg::*; #(
         .cvxif_ready_i       ( x_issue_ready_i                 ),
         .cvxif_off_instr_o   ( x_off_instr_o                   ),
         .mult_valid_o        ( mult_valid_o                    ),
+
+	.clr_i               ( clr_i                           ),
         .*
     );
 

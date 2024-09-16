@@ -12,12 +12,14 @@
 // Date: 13.10.2017
 // Description: Nonblocking private L1 dcache
 
+`include "common_cells/registers.svh"
 
 module std_nbdcache import std_cache_pkg::*; import ariane_pkg::*; #(
     parameter ariane_cfg_t ArianeCfg        = ArianeDefaultConfig // contains cacheable regions
 )(
     input  logic                           clk_i,       // Clock
     input  logic                           rst_ni,      // Asynchronous reset active low
+    input  logic                           clr_i,       // Synchronous clear active high
     // Cache management
     input  logic                           enable_i,    // from CSR
     input  logic                           flush_i,     // high until acknowledged
@@ -118,6 +120,8 @@ import std_cache_pkg::*;
                 .mshr_addr_o           ( mshr_addr         [i] ),
                 .mshr_addr_matches_i   ( mshr_addr_matches [i] ),
                 .mshr_index_matches_i  ( mshr_index_matches[i] ),
+
+		.clr_i                 ( clr_i                 ),
                 .*
             );
         end
@@ -155,6 +159,8 @@ import std_cache_pkg::*;
         .axi_bypass_i,
         .axi_data_o,
         .axi_data_i,
+
+	.clr_i,
         .*
     );
 
@@ -170,6 +176,7 @@ import std_cache_pkg::*;
         ) data_sram (
             .req_i   ( req_ram [i]                          ),
             .rst_ni  ( rst_ni                               ),
+	    .clr_i   ( clr_i                                ),
             .we_i    ( we_ram                               ),
             .addr_i  ( addr_ram[DCACHE_INDEX_WIDTH-1:DCACHE_BYTE_OFFSET]  ),
             .wdata_i ( wdata_ram.data                       ),
@@ -184,6 +191,7 @@ import std_cache_pkg::*;
         ) tag_sram (
             .req_i   ( req_ram [i]                          ),
             .rst_ni  ( rst_ni                               ),
+	    .clr_i   ( clr_i                                ),
             .we_i    ( we_ram                               ),
             .addr_i  ( addr_ram[DCACHE_INDEX_WIDTH-1:DCACHE_BYTE_OFFSET]  ),
             .wdata_i ( wdata_ram.tag                        ),
@@ -216,6 +224,7 @@ import std_cache_pkg::*;
     ) valid_dirty_sram (
         .clk_i   ( clk_i                               ),
         .rst_ni  ( rst_ni                              ),
+	.clr_i   ( clr_i                               ),
         .req_i   ( |req_ram                            ),
         .we_i    ( we_ram                              ),
         .addr_i  ( addr_ram[DCACHE_INDEX_WIDTH-1:DCACHE_BYTE_OFFSET] ),

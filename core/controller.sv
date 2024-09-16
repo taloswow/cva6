@@ -12,10 +12,12 @@
 // Date: 08.05.2017
 // Description: Flush controller
 
+`include "common_cells/registers.svh"
 
 module controller import ariane_pkg::*; (
     input  logic            clk_i,
     input  logic            rst_ni,
+    input  logic            clr_i,
     output logic            set_pc_commit_o,        // Set PC om PC Gen
     output logic            flush_if_o,             // Flush the IF stage
     output logic            flush_unissued_instr_o, // Flush un-issued instructions of the scoreboard
@@ -169,14 +171,6 @@ module controller import ariane_pkg::*; (
     // ----------------------
     // Registers
     // ----------------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            fence_active_q <= 1'b0;
-            flush_dcache_o <= 1'b0;
-        end else begin
-            fence_active_q <= fence_active_d;
-            // register on the flush signal, this signal might be critical
-            flush_dcache_o <= flush_dcache;
-        end
-    end
+    `FFC(fence_active_q, fence_active_d, 1'b0, clk_i, rst_ni, clr_i)
+    `FFC(flush_dcache_o, flush_dcache, 1'b0, clk_i, rst_ni, clr_i)
 endmodule

@@ -15,6 +15,9 @@
 // Description: Arbitrates access to cache memories, simplified request grant protocol
 //              checks for hit or miss on cache
 //
+
+`include "common_cells/registers.svh"
+
 module tag_cmp #(
     parameter int unsigned NR_PORTS          = 3,
     parameter int unsigned ADDR_WIDTH        = 64,
@@ -24,6 +27,7 @@ module tag_cmp #(
 ) (
     input  logic                                          clk_i,
     input  logic                                          rst_ni,
+    input  logic                                          clr_i,
 
     input  logic    [NR_PORTS-1:0][DCACHE_SET_ASSOC-1:0]             req_i,
     output logic    [NR_PORTS-1:0]                                   gnt_o,
@@ -95,12 +99,6 @@ module tag_cmp #(
         `endif
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            id_q <= 0;
-        end else begin
-            id_q <= id_d;
-        end
-    end
+    `FFC(id_q, id_d, 0, clk_i, rst_ni, clr_i)
 
 endmodule

@@ -19,10 +19,12 @@
 // Furthermore we need to handle the case if we want to start fetching from an unaligned
 // instruction e.g. a branch.
 
+`include "common_cells/registers.svh"
 
 module instr_realign import ariane_pkg::*; (
     input  logic                              clk_i,
     input  logic                              rst_ni,
+    input  logic                              clr_i,
     input  logic                              flush_i,
     input  logic                              valid_i,
     output logic                              serving_unaligned_o, // we have an unaligned instruction in [0]
@@ -336,22 +338,19 @@ module instr_realign import ariane_pkg::*; (
         end
     end
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            unaligned_q         <= 1'b0;
-            unaligned_address_q <= '0;
-            unaligned_instr_q   <= '0;
-        end else begin
-            if (valid_i) begin
-                unaligned_address_q <= unaligned_address_d;
-                unaligned_instr_q   <= unaligned_instr_d;
-            end
+    logic unaligned_in;
 
-            if (flush_i) begin
-                unaligned_q <= 1'b0;
-            end else if (valid_i) begin
-                unaligned_q <= unaligned_d;
-            end
-        end
+    always_comb begin
+        if (flush_i) begin
+            unaligned_in = 1'b0;
+        end else if (valid_i) begin
+	    unaligned_in = unaligned_d;
+	end else begin
+	    unaligned_in = unaligned_q;
+	end
     end
+
+    `FFLARNC(unaligned_address_q, unaligned_address_d, valid_i, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(unaligned_instr_q, unaligned_instr_q, valid_i, clr_i, '0, clk_i, rst_ni)
+    `FFC(unaligned_q, unaligned_in, 1'b0, clk_i, rst_ni, clr_i)
 endmodule

@@ -17,12 +17,14 @@
 //
 // Description: Cache controller
 
+`include "common_cells/registers.svh"
 
 module cache_ctrl import ariane_pkg::*; import std_cache_pkg::*; #(
     parameter ariane_cfg_t ArianeCfg = ArianeDefaultConfig // contains cacheable regions
 ) (
     input  logic                                 clk_i,     // Clock
     input  logic                                 rst_ni,    // Asynchronous reset active low
+    input  logic                                 clr_i,     // Synchronous clear active high
     input  logic                                 flush_i,
     input  logic                                 bypass_i,  // enable cache
     output logic                                 busy_o,
@@ -436,17 +438,9 @@ module cache_ctrl import ariane_pkg::*; import std_cache_pkg::*; #(
     // --------------
     // Registers
     // --------------
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q       <= IDLE;
-            mem_req_q     <= '0;
-            hit_way_q     <= '0;
-        end else begin
-            state_q   <= state_d;
-            mem_req_q <= mem_req_d;
-            hit_way_q <= hit_way_d;
-        end
-    end
+    `FFC(state_q, state_d, IDLE, clk_i, rst_ni, clr_i)
+    `FFC(mem_req_q, mem_req_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(hit_way_q, hit_way_d, '0, clk_i, rst_ni, clr_i)
 
     //pragma translate_off
     `ifndef VERILATOR

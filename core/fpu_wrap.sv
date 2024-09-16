@@ -16,6 +16,7 @@
 module fpu_wrap import ariane_pkg::*; (
   input  logic                     clk_i,
   input  logic                     rst_ni,
+  input  logic                     clr_i,
   input  logic                     flush_i,
   input  logic                     fpu_valid_i,
   output logic                     fpu_ready_o,
@@ -452,38 +453,18 @@ module fpu_wrap import ariane_pkg::*; (
     end
 
     // Buffer register and FSM state holding
-    always_ff @(posedge clk_i or negedge rst_ni) begin : fp_hold_reg
-      if(~rst_ni) begin
-        state_q       <= READY;
-        operand_a_q   <= '0;
-        operand_b_q   <= '0;
-        operand_c_q   <= '0;
-        fpu_op_q      <= '0;
-        fpu_op_mod_q  <= '0;
-        fpu_srcfmt_q  <= '0;
-        fpu_dstfmt_q  <= '0;
-        fpu_ifmt_q    <= '0;
-        fpu_rm_q      <= '0;
-        fpu_vec_op_q  <= '0;
-        fpu_tag_q     <= '0;
-      end else begin
-        state_q       <= state_d;
-        // Hold register is [TRIGGERED] by FSM
-        if (hold_inputs) begin
-          operand_a_q   <= operand_a_d;
-          operand_b_q   <= operand_b_d;
-          operand_c_q   <= operand_c_d;
-          fpu_op_q      <= fpu_op_d;
-          fpu_op_mod_q  <= fpu_op_mod_d;
-          fpu_srcfmt_q  <= fpu_srcfmt_d;
-          fpu_dstfmt_q  <= fpu_dstfmt_d;
-          fpu_ifmt_q    <= fpu_ifmt_d;
-          fpu_rm_q      <= fpu_rm_d;
-          fpu_vec_op_q  <= fpu_vec_op_d;
-          fpu_tag_q     <= fpu_tag_d;
-        end
-      end
-    end
+    `FFC(state_q, state_d, READY, clk_i, rst_ni, clr_i)
+    `FFLARNC(operand_a_q, operand_a_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(operand_b_q, operand_b_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(operand_c_q, operand_c_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_op_q, fpu_op_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_op_mod_q, fpu_op_mod_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_srcfmt_q, fpu_srcfmt_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_dstfmt_q, fpu_dstfmt_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_ifmt_q, fpu_ifmt_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_rm_q, fpu_rm_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_vec_op_q, fpu_vec_op_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(fpu_tag_q, fpu_tag_d, hold_inputs, clr_i, '0, clk_i, rst_ni)
 
     // Select FPU input data: from register if valid data in register, else directly from input
     assign operand_a  = use_hold ? operand_a_q  : operand_a_d;
@@ -516,6 +497,7 @@ module fpu_wrap import ariane_pkg::*; (
     ) i_fpnew_bulk (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .operands_i     ( fpu_operands                        ),
       .rnd_mode_i     ( fpnew_pkg::roundmode_e'(fpu_rm)     ),
       .op_i           ( fpnew_pkg::operation_e'(fpu_op)     ),

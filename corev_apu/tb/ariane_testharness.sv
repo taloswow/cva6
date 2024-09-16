@@ -285,6 +285,7 @@ module ariane_testharness #(
   ) i_dm_axi_master (
     .clk_i                 ( clk_i                     ),
     .rst_ni                ( rst_ni                    ),
+    .clr_i                 ( 1'b0                      ),
     .req_i                 ( dm_master_req             ),
     .type_i                ( ariane_axi::SINGLE_REQ    ),
     .amo_i                 ( ariane_pkg::AMO_NONE      ),
@@ -448,6 +449,7 @@ module ariane_testharness #(
   ) i_sram (
     .clk_i      ( clk_i                                                                       ),
     .rst_ni     ( rst_ni                                                                      ),
+    .clr_i      ( 1'b0                                                                        ),
     .req_i      ( req                                                                         ),
     .we_i       ( we                                                                          ),
     .addr_i     ( addr[$clog2(NUM_WORDS)-1+$clog2(AXI_DATA_WIDTH/8):$clog2(AXI_DATA_WIDTH/8)] ),

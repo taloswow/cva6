@@ -16,6 +16,7 @@
 module store_unit import ariane_pkg::*; (
     input  logic                     clk_i,    // Clock
     input  logic                     rst_ni,  // Asynchronous reset active low
+    input  logic                     clr_i,   // Synchronous clear active high
     input  logic                     flush_i,
     output logic                     no_st_pending_o,
     output logic                     store_buffer_empty_o,
@@ -241,6 +242,7 @@ module store_unit import ariane_pkg::*; (
     amo_buffer i_amo_buffer (
         .clk_i,
         .rst_ni,
+	.clr_i,
         .flush_i,
         .valid_i            ( amo_buffer_valid   ),
         .ready_o            ( amo_buffer_ready   ),

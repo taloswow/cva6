@@ -15,11 +15,14 @@
 // This module interfaces with the instruction cache, handles control
 // change request from the back-end and does branch prediction.
 
+`include "common_cells/registers.svh"
+
 module frontend import ariane_pkg::*; #(
   parameter ariane_pkg::ariane_cfg_t ArianeCfg = ariane_pkg::ArianeDefaultConfig
 ) (
   input  logic               clk_i,              // Clock
   input  logic               rst_ni,             // Asynchronous reset active low
+  input  logic               clr_i,              // Synchronous clear active high`
   input  logic               flush_i,            // flush request for PCGEN
   input  logic               flush_bp_i,         // flush branch prediction
   input  logic               debug_mode_i,
@@ -112,6 +115,7 @@ module frontend import ariane_pkg::*; #(
     instr_realign i_instr_realign (
       .clk_i               ( clk_i                 ),
       .rst_ni              ( rst_ni                ),
+      .clr_i               ( clr_i                 ),
       .flush_i             ( icache_dreq_o.kill_s2 ),
       .valid_i             ( icache_valid_q        ),
       .serving_unaligned_o ( serving_unaligned     ),
@@ -121,6 +125,7 @@ module frontend import ariane_pkg::*; #(
       .addr_o              ( addr                  ),
       .instr_o             ( instr                 )
     );
+
     // --------------------
     // Branch Prediction
     // --------------------
@@ -337,43 +342,34 @@ module frontend import ariane_pkg::*; #(
     // re-align the cache line
     assign icache_data = icache_dreq_i.data >> {shamt, 4'b0};
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-      if (!rst_ni) begin
-        npc_rst_load_q    <= 1'b1;
-        npc_q             <= '0;
-        speculative_q     <= '0;
-        icache_data_q     <= '0;
-        icache_valid_q    <= 1'b0;
-        icache_vaddr_q    <= 'b0;
-        icache_ex_valid_q <= ariane_pkg::FE_NONE;
-        btb_q             <= '0;
-        bht_q             <= '0;
-      end else begin
-        npc_rst_load_q    <= 1'b0;
-        npc_q             <= npc_d;
-        speculative_q    <= speculative_d;
-        icache_valid_q    <= icache_dreq_i.valid;
-        if (icache_dreq_i.valid) begin
-          icache_data_q        <= icache_data;
-          icache_vaddr_q       <= icache_dreq_i.vaddr;
-          // Map the only three exceptions which can occur in the frontend to a two bit enum
-          if (icache_dreq_i.ex.cause == riscv::INSTR_PAGE_FAULT) begin
-            icache_ex_valid_q <= ariane_pkg::FE_INSTR_PAGE_FAULT;
-          end else if (icache_dreq_i.ex.cause == riscv::INSTR_ACCESS_FAULT) begin
-            icache_ex_valid_q <= ariane_pkg::FE_INSTR_ACCESS_FAULT;
-          end else icache_ex_valid_q <= ariane_pkg::FE_NONE;
-          // save the uppermost prediction
-          btb_q                <= btb_prediction[INSTR_PER_FETCH-1];
-          bht_q                <= bht_prediction[INSTR_PER_FETCH-1];
-        end
-      end
+    logic icache_ex_valid_in;
+
+    always_comb begin
+        if (icache_dreq_i.ex.cause == riscv::INSTR_PAGE_FAULT) begin
+            icache_ex_valid_in = ariane_pkg::FE_INSTR_PAGE_FAULT;
+	end else if (icache_dreq_i.ex.cause == riscv::INSTR_ACCESS_FAULT) begin
+	    icache_ex_valid_in = ariane_pkg::FE_INSTR_ACCESS_FAULT;
+	end else begin
+            icache_ex_valid_in = ariane_pkg::FE_NONE;
+	end
     end
+
+    `FFC(npc_rst_load_q, 1'b0, 1'b1, clk_i, rst_ni, clr_i)
+    `FFC(npc_q, npc_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(speculative_q, speculative_d, '0, clk_i, rst_ni, clr_i)
+    `FFC(icache_valid_q, icache_dreq_i.valid, '0, clk_i, rst_ni, clr_i)
+    `FFLARNC(icache_data_q, icache_data, icache_dreq_i.valid, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(icache_vaddr_q, icache_dreq_i.vaddr, icache_dreq_i.valid, clr_i, 'b0, clk_i, rst_ni)
+    `FFLARNC(btb_q, btb_prediction[INSTR_PER_FETCH-1], icache_dreq_i.valid, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(bht_q, bht_prediction[INSTR_PER_FETCH-1], icache_dreq_i.valid, clr_i, '0, clk_i, rst_ni)
+    `FFLARNC(icache_ex_valid_q, icache_ex_valid_in, icache_dreq_i.valid, clr_i, ariane_pkg::FE_NONE, clk_i, rst_ni)
 
     ras #(
       .DEPTH  ( ArianeCfg.RASDepth  )
-    ) i_ras (
+    ) i_ras (	
       .clk_i,
       .rst_ni,
+      .clr_i,
       .flush_i( flush_bp_i  ),
       .push_i ( ras_push    ),
       .pop_i  ( ras_pop     ),
@@ -386,6 +382,7 @@ module frontend import ariane_pkg::*; #(
     ) i_btb (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .flush_i          ( flush_bp_i       ),
       .debug_mode_i,
       .vpc_i            ( icache_vaddr_q   ),
@@ -398,6 +395,7 @@ module frontend import ariane_pkg::*; #(
     ) i_bht (
       .clk_i,
       .rst_ni,
+      .clr_i,
       .flush_i          ( flush_bp_i       ),
       .debug_mode_i,
       .vpc_i            ( icache_vaddr_q   ),
@@ -429,6 +427,7 @@ module frontend import ariane_pkg::*; #(
     instr_queue i_instr_queue (
       .clk_i               ( clk_i                ),
       .rst_ni              ( rst_ni               ),
+      .clr_i               ( clr_i                ),
       .flush_i             ( flush_i              ),
       .instr_i             ( instr                ), // from re-aligner
       .addr_i              ( addr                 ), // from re-aligner

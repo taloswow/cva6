@@ -71,6 +71,10 @@ module cva6 import ariane_pkg::*; #(
   logic                       eret;
   logic [NR_COMMIT_PORTS-1:0] commit_ack;
 
+  // clear signal, first set to 0
+  logic                       clr_i;
+  assign clr_i = 0;
+
   // --------------
   // PCGEN <-> CSR
   // --------------
@@ -258,6 +262,7 @@ module cva6 import ariane_pkg::*; #(
   frontend #(
     .ArianeCfg ( ArianeCfg )
   ) i_frontend (
+    .clr_i               ( clr_i                         ),
     .flush_i             ( flush_ctrl_if                 ), // not entirely correct
     .flush_bp_i          ( 1'b0                          ),
     .debug_mode_i        ( debug_mode                    ),
@@ -277,13 +282,14 @@ module cva6 import ariane_pkg::*; #(
     .fetch_entry_ready_i ( fetch_ready_id_if             ),
     .*
   );
-
+  
   // ---------
   // ID
   // ---------
   id_stage id_stage_i (
     .clk_i,
     .rst_ni,
+    .clr_i,
     .flush_i                    ( flush_ctrl_if              ),
     .debug_req_i,
 
@@ -317,6 +323,7 @@ module cva6 import ariane_pkg::*; #(
   ) issue_stage_i (
     .clk_i,
     .rst_ni,
+    .clr_i,
     .sb_full_o                  ( sb_full                      ),
     .flush_unissued_instr_i     ( flush_unissued_instr_ctrl_id ),
     .flush_i                    ( flush_ctrl_id                ),
@@ -381,6 +388,7 @@ module cva6 import ariane_pkg::*; #(
   ) ex_stage_i (
     .clk_i                  ( clk_i                       ),
     .rst_ni                 ( rst_ni                      ),
+    .clr_i                  ( clr_i                       ),
     .debug_mode_i           ( debug_mode                  ),
     .flush_i                ( flush_ctrl_ex               ),
     .rs1_forwarding_i       ( rs1_forwarding_id_ex        ),
@@ -577,6 +585,8 @@ module cva6 import ariane_pkg::*; #(
     .ipi_i,
     .irq_i,
     .time_irq_i,
+
+    .clr_i,
     .*
   );
   // ------------------------
@@ -585,6 +595,7 @@ module cva6 import ariane_pkg::*; #(
   perf_counters i_perf_counters (
     .clk_i             ( clk_i                  ),
     .rst_ni            ( rst_ni                 ),
+    .clr_i             ( clr_i                  ),
     .debug_mode_i      ( debug_mode             ),
     .addr_i            ( addr_csr_perf          ),
     .we_i              ( we_csr_perf            ),
@@ -633,6 +644,8 @@ module cva6 import ariane_pkg::*; #(
     .flush_commit_i         ( flush_commit                  ),
 
     .flush_icache_o         ( icache_flush_ctrl_cache       ),
+
+    .clr_i                  ( clr_i                         ),
     .*
   );
 
@@ -648,6 +661,7 @@ module cva6 import ariane_pkg::*; #(
     // to D$
     .clk_i                 ( clk_i                       ),
     .rst_ni                ( rst_ni                      ),
+    .clr_i                 ( clr_i                       ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
     .icache_flush_i        ( icache_flush_ctrl_cache     ),
@@ -690,6 +704,7 @@ module cva6 import ariane_pkg::*; #(
     // to D$
     .clk_i                 ( clk_i                       ),
     .rst_ni                ( rst_ni                      ),
+    .clr_i                 ( clr_i                       ),
     .priv_lvl_i            ( priv_lvl                    ),
     // I$
     .icache_en_i           ( icache_en_csr               ),
@@ -764,6 +779,7 @@ module cva6 import ariane_pkg::*; #(
     i_pc_fifo (
       .clk_i      ( clk_i                                               ),
       .rst_ni     ( rst_ni                                              ),
+      .clr_i      ( clr_i                                               ),
       .flush_i    ( '0                                                  ),
       .testmode_i ( '0                                                  ),
       .full_o     (                                                     ),
@@ -782,6 +798,7 @@ module cva6 import ariane_pkg::*; #(
   i_rr_arb_tree (
     .clk_i   ( clk_i        ),
     .rst_ni  ( rst_ni       ),
+    .clr_i   ( clr_i        ),
     .flush_i ( '0           ),
     .rr_i    ( '0           ),
     .req_i   ( ~pc_empty    ),

@@ -24,6 +24,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
 ) (
   input logic                            clk_i,
   input logic                            rst_ni,
+  input logic                            clr_i,
   // I$
   input  logic                           icache_en_i,            // enable icache (or bypass e.g: in debug mode)
   input  logic                           icache_flush_i,         // flush the icache, flush and kill have to be asserted together
@@ -77,6 +78,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_cva6_icache (
     .clk_i              ( clk_i                   ),
     .rst_ni             ( rst_ni                  ),
+    .clr_i              ( clr_i                   ),
     .flush_i            ( icache_flush_i          ),
     .en_i               ( icache_en_i             ),
     .miss_o             ( icache_miss_o           ),
@@ -104,6 +106,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   ) i_wt_dcache (
     .clk_i           ( clk_i                   ),
     .rst_ni          ( rst_ni                  ),
+    .clr_i           ( clr_i                   ),
     .enable_i        ( dcache_enable_i         ),
     .flush_i         ( dcache_flush_i          ),
     .flush_ack_o     ( dcache_flush_ack_o      ),
@@ -150,6 +153,7 @@ module wt_cache_subsystem import ariane_pkg::*; import wt_cache_pkg::*; #(
   wt_axi_adapter i_adapter (
     .clk_i              ( clk_i                   ),
     .rst_ni             ( rst_ni                  ),
+    .clr_i              ( clr_i                   ),
     .icache_data_req_i  ( icache_adapter_data_req ),
     .icache_data_ack_o  ( adapter_icache_data_ack ),
     .icache_data_i      ( icache_adapter          ),

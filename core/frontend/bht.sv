@@ -19,6 +19,7 @@ module bht #(
 )(
     input  logic                        clk_i,
     input  logic                        rst_ni,
+    input  logic                        clr_i,
     input  logic                        flush_i,
     input  logic                        debug_mode_i,
     input  logic [riscv::VLEN-1:0]      vpc_i,
@@ -87,7 +88,7 @@ module bht #(
     end
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+        if (!rst_ni || clr_i) begin
             for (int unsigned i = 0; i < NR_ROWS; i++) begin
                 for (int j = 0; j < ariane_pkg::INSTR_PER_FETCH; j++) begin
                     bht_q[i][j] <= '0;
